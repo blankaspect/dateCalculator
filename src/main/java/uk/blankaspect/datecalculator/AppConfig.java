@@ -286,7 +286,7 @@ class AppConfig
 		private CPShowUnixPathnames()
 		{
 			super(concatenateKeys(Key.GENERAL, Key.SHOW_UNIX_PATHNAMES));
-			value = Boolean.FALSE;
+			value = false;
 		}
 
 		//--------------------------------------------------------------
@@ -350,7 +350,7 @@ class AppConfig
 		private CPSelectTextOnFocusGained()
 		{
 			super(concatenateKeys(Key.GENERAL, Key.SELECT_TEXT_ON_FOCUS_GAINED));
-			value = Boolean.TRUE;
+			value = true;
 		}
 
 		//--------------------------------------------------------------
@@ -594,7 +594,7 @@ class AppConfig
 		private CPShowAdjacentMonths()
 		{
 			super(concatenateKeys(Key.APPEARANCE, Key.SHOW_ADJACENT_MONTHS));
-			value = Boolean.TRUE;
+			value = true;
 		}
 
 		//--------------------------------------------------------------
@@ -1138,14 +1138,14 @@ class AppConfig
 
 	public static void showWarningMessage(AppException exception)
 	{
-		App.INSTANCE.showWarningMessage(App.SHORT_NAME + " | " + CONFIG_ERROR_STR, exception);
+		App.INSTANCE.showWarningMessage(App.SHORT_NAME + " : " + CONFIG_ERROR_STR, exception);
 	}
 
 	//------------------------------------------------------------------
 
 	public static void showErrorMessage(AppException exception)
 	{
-		App.INSTANCE.showErrorMessage(App.SHORT_NAME + " | " + CONFIG_ERROR_STR, exception);
+		App.INSTANCE.showErrorMessage(App.SHORT_NAME + " : " + CONFIG_ERROR_STR, exception);
 	}
 
 	//------------------------------------------------------------------
