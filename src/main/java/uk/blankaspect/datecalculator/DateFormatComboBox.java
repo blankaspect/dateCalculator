@@ -22,9 +22,9 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-import uk.blankaspect.common.gui.ComboBoxRenderer;
+import uk.blankaspect.common.date.DateFormat;
 
-import uk.blankaspect.common.misc.DateFormat;
+import uk.blankaspect.common.swing.combobox.ComboBoxRenderer;
 
 //----------------------------------------------------------------------
 
@@ -84,7 +84,7 @@ class DateFormatComboBox
 		//--------------------------------------------------------------
 
 	////////////////////////////////////////////////////////////////////
-	//  Instance fields
+	//  Instance variables
 	////////////////////////////////////////////////////////////////////
 
 		private	DateFormat	dateFormat;

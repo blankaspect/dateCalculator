@@ -47,11 +47,13 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import uk.blankaspect.common.gui.FButton;
-import uk.blankaspect.common.gui.FLabel;
-import uk.blankaspect.common.gui.GuiUtils;
+import uk.blankaspect.common.swing.action.KeyAction;
 
-import uk.blankaspect.common.misc.KeyAction;
+import uk.blankaspect.common.swing.button.FButton;
+
+import uk.blankaspect.common.swing.label.FLabel;
+
+import uk.blankaspect.common.swing.misc.GuiUtils;
 
 //----------------------------------------------------------------------
 
@@ -124,7 +126,7 @@ class DateNameDialog
 		// Set icons
 		setIconImages(owner.getIconImages());
 
-		// Initialise instance fields
+		// Initialise instance variables
 		this.localeNames = localeNames;
 
 
@@ -452,13 +454,13 @@ class DateNameDialog
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Class fields
+//  Class variables
 ////////////////////////////////////////////////////////////////////////
 
 	private static	Point	location;
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance fields
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
 	private	boolean			accepted;

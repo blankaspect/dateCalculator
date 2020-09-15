@@ -38,9 +38,11 @@ import javax.swing.JTabbedPane;
 
 import uk.blankaspect.common.exception.ExceptionUtils;
 
-import uk.blankaspect.common.gui.FButton;
-import uk.blankaspect.common.gui.FTabbedPane;
-import uk.blankaspect.common.gui.GuiUtils;
+import uk.blankaspect.common.swing.button.FButton;
+
+import uk.blankaspect.common.swing.misc.GuiUtils;
+
+import uk.blankaspect.common.swing.tabbedpane.FTabbedPane;
 
 //----------------------------------------------------------------------
 

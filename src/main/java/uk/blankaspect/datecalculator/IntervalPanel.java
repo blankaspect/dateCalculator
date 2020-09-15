@@ -39,19 +39,26 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import uk.blankaspect.common.date.DateFormat;
+
 import uk.blankaspect.common.exception.AppException;
 
-import uk.blankaspect.common.gui.FButton;
-import uk.blankaspect.common.gui.FIntegerSpinner;
-import uk.blankaspect.common.gui.FixedWidthRadioButton;
-import uk.blankaspect.common.gui.FLabel;
-import uk.blankaspect.common.gui.GuiUtils;
-import uk.blankaspect.common.gui.NonEditableTextAreaDialog;
-
-import uk.blankaspect.common.misc.DateFormat;
 import uk.blankaspect.common.misc.MaxValueMap;
-import uk.blankaspect.common.misc.Property;
-import uk.blankaspect.common.misc.StringUtils;
+
+import uk.blankaspect.common.property.Property;
+
+import uk.blankaspect.common.string.StringUtils;
+
+import uk.blankaspect.common.swing.button.FButton;
+import uk.blankaspect.common.swing.button.FixedWidthRadioButton;
+
+import uk.blankaspect.common.swing.dialog.NonEditableTextAreaDialog;
+
+import uk.blankaspect.common.swing.label.FLabel;
+
+import uk.blankaspect.common.swing.misc.GuiUtils;
+
+import uk.blankaspect.common.swing.spinner.FIntegerSpinner;
 
 //----------------------------------------------------------------------
 
@@ -167,7 +174,7 @@ class IntervalPanel
 		//--------------------------------------------------------------
 
 	////////////////////////////////////////////////////////////////////
-	//  Instance fields
+	//  Instance variables
 	////////////////////////////////////////////////////////////////////
 
 		private	String	message;
@@ -315,7 +322,7 @@ class IntervalPanel
 	public IntervalPanel()
 	{
 
-		// Initialise instance fields
+		// Initialise instance variables
 		mode = Mode.NUM_INTERVALS;
 
 
@@ -828,7 +835,7 @@ class IntervalPanel
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance fields
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
 	private	Mode				mode;

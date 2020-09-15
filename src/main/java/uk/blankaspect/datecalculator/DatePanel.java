@@ -30,11 +30,13 @@ import java.util.Calendar;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import uk.blankaspect.common.gui.DateSelectionDialog;
-import uk.blankaspect.common.gui.FButton;
+import uk.blankaspect.common.date.Date;
 
-import uk.blankaspect.common.misc.Date;
 import uk.blankaspect.common.misc.ModernCalendar;
+
+import uk.blankaspect.common.swing.button.FButton;
+
+import uk.blankaspect.common.swing.dialog.DateSelectionDialog;
 
 //----------------------------------------------------------------------
 
@@ -71,7 +73,7 @@ class DatePanel
 					 String selectTooltipString,
 					 String todayTooltipString)
 	{
-		// Initialise instance fields
+		// Initialise instance variables
 		this.key = key;
 		selectedDate = new Date(new ModernCalendar());
 
@@ -215,12 +217,11 @@ class DatePanel
 
 		AppConfig config = AppConfig.INSTANCE;
 		date = DateSelectionDialog.showDialog(this, selectButton.getLocationOnScreen(), date,
-											  config.getFirstDayOfWeek(), config.isShowAdjacentMonths(),
-											  key);
+											  config.getFirstDayOfWeek(), config.isShowAdjacentMonths(), key);
 		if (date != null)
 		{
 			selectedDate = date;
-			dateField.setDate(date.year, date.month + 1, date.day + 1);
+			dateField.setDate(date.getYear(), date.getMonth() + 1, date.getDay() + 1);
 		}
 	}
 
@@ -229,14 +230,13 @@ class DatePanel
 	private void onSetDateToToday()
 	{
 		Calendar date = new ModernCalendar();
-		dateField.setDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH) + 1,
-						  date.get(Calendar.DAY_OF_MONTH));
+		dateField.setDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH) + 1, date.get(Calendar.DAY_OF_MONTH));
 	}
 
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance fields
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
 	private	String				key;

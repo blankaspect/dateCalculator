@@ -18,19 +18,29 @@ package uk.blankaspect.datecalculator;
 // IMPORTS
 
 
+import java.io.IOException;
+
+import java.time.LocalDateTime;
+
+import java.time.format.DateTimeFormatter;
+
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import uk.blankaspect.common.cls.ClassUtils;
+
 import uk.blankaspect.common.exception.ExceptionUtils;
 
-import uk.blankaspect.common.gui.TextRendering;
+import uk.blankaspect.common.exception2.LocationException;
 
-import uk.blankaspect.common.misc.CalendarTime;
-import uk.blankaspect.common.misc.ClassUtils;
-import uk.blankaspect.common.misc.ResourceProperties;
+import uk.blankaspect.common.logging.ErrorLogger;
 
-import uk.blankaspect.common.textfield.TextFieldUtils;
+import uk.blankaspect.common.resource.ResourceProperties;
+
+import uk.blankaspect.common.swing.text.TextRendering;
+
+import uk.blankaspect.common.swing.textfield.TextFieldUtils;
 
 //----------------------------------------------------------------------
 
@@ -54,6 +64,8 @@ public class App
 	private static final	String	VERSION_PROPERTY_KEY	= "version";
 	private static final	String	BUILD_PROPERTY_KEY		= "build";
 	private static final	String	RELEASE_PROPERTY_KEY	= "release";
+
+	private static final	String	VERSION_DATE_TIME_PATTERN	= "uuuuMMdd-HHmmss";
 
 	private static final	String	BUILD_PROPERTIES_FILENAME	= "build.properties";
 
@@ -128,11 +140,8 @@ public class App
 			}
 			else
 			{
-				long time = System.currentTimeMillis();
 				buffer.append('b');
-				buffer.append(CalendarTime.dateToString(time));
-				buffer.append('-');
-				buffer.append(CalendarTime.hoursMinsToString(time));
+				buffer.append(DateTimeFormatter.ofPattern(VERSION_DATE_TIME_PATTERN).format(LocalDateTime.now()));
 			}
 			versionStr = buffer.toString();
 		}
@@ -168,8 +177,31 @@ public class App
 
 	private void init()
 	{
+		// Log stack trace of uncaught exception
+		if (ClassUtils.isFromJar(getClass()))
+		{
+			Thread.setDefaultUncaughtExceptionHandler((thread, exception) ->
+			{
+				try
+				{
+					ErrorLogger.INSTANCE.write(exception);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			});
+		}
+
 		// Read build properties
-		buildProperties = new ResourceProperties(BUILD_PROPERTIES_FILENAME, getClass());
+		try
+		{
+			buildProperties = new ResourceProperties(BUILD_PROPERTIES_FILENAME);
+		}
+		catch (LocationException e)
+		{
+			e.printStackTrace();
+		}
 
 		// Read configuration
 		AppConfig config = AppConfig.INSTANCE;
@@ -223,7 +255,7 @@ public class App
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance fields
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
 	private	ResourceProperties	buildProperties;

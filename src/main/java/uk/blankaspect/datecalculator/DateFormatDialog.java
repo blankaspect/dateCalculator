@@ -50,18 +50,25 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+import uk.blankaspect.common.date.DateFormat;
+
 import uk.blankaspect.common.exception.AppException;
 
-import uk.blankaspect.common.gui.Colours;
-import uk.blankaspect.common.gui.FButton;
-import uk.blankaspect.common.gui.FLabel;
-import uk.blankaspect.common.gui.FontStyle;
-import uk.blankaspect.common.gui.FTextField;
-import uk.blankaspect.common.gui.GuiUtils;
-import uk.blankaspect.common.gui.TaggedText;
+import uk.blankaspect.common.swing.action.KeyAction;
 
-import uk.blankaspect.common.misc.DateFormat;
-import uk.blankaspect.common.misc.KeyAction;
+import uk.blankaspect.common.swing.button.FButton;
+
+import uk.blankaspect.common.swing.colour.Colours;
+
+import uk.blankaspect.common.swing.font.FontStyle;
+
+import uk.blankaspect.common.swing.label.FLabel;
+
+import uk.blankaspect.common.swing.misc.GuiUtils;
+
+import uk.blankaspect.common.swing.text.TaggedText;
+
+import uk.blankaspect.common.swing.textfield.FTextField;
 
 //----------------------------------------------------------------------
 
@@ -196,7 +203,7 @@ class DateFormatDialog
 		//--------------------------------------------------------------
 
 	////////////////////////////////////////////////////////////////////
-	//  Instance fields
+	//  Instance variables
 	////////////////////////////////////////////////////////////////////
 
 		private	String	message;
@@ -301,7 +308,7 @@ class DateFormatDialog
 			//----------------------------------------------------------
 
 		////////////////////////////////////////////////////////////////
-		//  Instance fields
+		//  Instance variables
 		////////////////////////////////////////////////////////////////
 
 			private	TaggedText	text;
@@ -474,7 +481,7 @@ class DateFormatDialog
 		// Set icons
 		setIconImages(owner.getIconImages());
 
-		// Initialise instance fields
+		// Initialise instance variables
 		this.names = names;
 
 
@@ -830,14 +837,14 @@ class DateFormatDialog
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Class fields
+//  Class variables
 ////////////////////////////////////////////////////////////////////////
 
 	private static	Point	location;
 	private static	Point	helpDialogLocation;
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance fields
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
 	private	List<String>	names;

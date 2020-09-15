@@ -22,7 +22,7 @@ import java.awt.Color;
 
 import javax.swing.JTextField;
 
-import uk.blankaspect.common.gui.GuiUtils;
+import uk.blankaspect.common.swing.misc.GuiUtils;
 
 //----------------------------------------------------------------------
 
@@ -41,8 +41,8 @@ class ResultField
 	private static final	int	VERTICAL_MARGIN		= 2;
 	private static final	int	HORIZONTAL_MARGIN	= 4;
 
-	private static final	Color	BACKGROUND_COLOUR	= new Color(252, 244, 200);
-	private static final	Color	BORDER_COLOUR		= new Color(240, 216, 160);
+	private static final	Color	BACKGROUND_COLOUR	= new Color(252, 248, 232);
+	private static final	Color	BORDER_COLOUR		= new Color(224, 208, 176);
 
 ////////////////////////////////////////////////////////////////////////
 //  Constructors

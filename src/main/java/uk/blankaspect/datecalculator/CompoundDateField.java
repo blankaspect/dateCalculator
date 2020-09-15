@@ -33,15 +33,21 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import uk.blankaspect.common.gui.DateSelectionPanel;
-import uk.blankaspect.common.gui.FLabel;
-import uk.blankaspect.common.gui.GuiUtils;
-
 import uk.blankaspect.common.misc.ModernCalendar;
-import uk.blankaspect.common.misc.NumberUtils;
-import uk.blankaspect.common.misc.StringUtils;
 
-import uk.blankaspect.common.textfield.IntegerField;
+import uk.blankaspect.common.number.NumberUtils;
+
+import uk.blankaspect.common.string.StringUtils;
+
+import uk.blankaspect.common.swing.container.DateSelectionPanel;
+
+import uk.blankaspect.common.swing.font.FontUtils;
+
+import uk.blankaspect.common.swing.label.FLabel;
+
+import uk.blankaspect.common.swing.misc.GuiUtils;
+
+import uk.blankaspect.common.swing.textfield.IntegerField;
 
 //----------------------------------------------------------------------
 
@@ -127,7 +133,7 @@ class CompoundDateField
 		//--------------------------------------------------------------
 
 	////////////////////////////////////////////////////////////////////
-	//  Instance fields
+	//  Instance variables
 	////////////////////////////////////////////////////////////////////
 
 		private	String	key;
@@ -202,7 +208,7 @@ class CompoundDateField
 		//--------------------------------------------------------------
 
 	////////////////////////////////////////////////////////////////////
-	//  Instance fields
+	//  Instance variables
 	////////////////////////////////////////////////////////////////////
 
 		private	FieldKey	key;
@@ -247,14 +253,13 @@ class CompoundDateField
 
 		public String[] getStrings()
 		{
-			return new String[]{ key.toString(), Integer.toString(minValue),
-								 Integer.toString(maxValue) };
+			return new String[] { key.toString(), Integer.toString(minValue), Integer.toString(maxValue) };
 		}
 
 		//--------------------------------------------------------------
 
 	////////////////////////////////////////////////////////////////////
-	//  Instance fields
+	//  Instance variables
 	////////////////////////////////////////////////////////////////////
 
 		private	FieldKey	key;
@@ -353,13 +358,13 @@ class CompoundDateField
 		@Override
 		protected int getColumnWidth()
 		{
-			return (GuiUtils.getCharWidth('0', getFontMetrics(getFont())) + 1);
+			return (FontUtils.getCharWidth('0', getFontMetrics(getFont())) + 1);
 		}
 
 		//--------------------------------------------------------------
 
 	////////////////////////////////////////////////////////////////////
-	//  Instance fields
+	//  Instance variables
 	////////////////////////////////////////////////////////////////////
 
 		private	FieldKey	key;
@@ -579,7 +584,7 @@ class CompoundDateField
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance fields
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
 	private	Map<FieldKey, DateComponentField>	fields;

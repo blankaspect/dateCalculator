@@ -36,11 +36,13 @@ import javax.swing.JPanel;
 
 import uk.blankaspect.common.exception.AppException;
 
-import uk.blankaspect.common.gui.FButton;
-import uk.blankaspect.common.gui.FLabel;
-import uk.blankaspect.common.gui.GuiUtils;
+import uk.blankaspect.common.swing.button.FButton;
 
-import uk.blankaspect.common.misc.Time;
+import uk.blankaspect.common.swing.label.FLabel;
+
+import uk.blankaspect.common.swing.misc.GuiUtils;
+
+import uk.blankaspect.common.time.Time;
 
 //----------------------------------------------------------------------
 
@@ -137,7 +139,7 @@ class DifferencePanel
 		//--------------------------------------------------------------
 
 	////////////////////////////////////////////////////////////////////
-	//  Instance fields
+	//  Instance variables
 	////////////////////////////////////////////////////////////////////
 
 		private	String	message;
@@ -451,7 +453,7 @@ class DifferencePanel
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance fields
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
 	private	DatePanel	startDatePanel;

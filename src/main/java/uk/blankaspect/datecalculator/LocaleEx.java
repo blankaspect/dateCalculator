@@ -22,11 +22,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import uk.blankaspect.common.gui.ComboBoxRenderer;
+import uk.blankaspect.common.collection.ArraySet;
 
-import uk.blankaspect.common.misc.ArraySet;
 import uk.blankaspect.common.misc.IStringKeyed;
-import uk.blankaspect.common.misc.StringUtils;
+
+import uk.blankaspect.common.string.StringUtils;
+
+import uk.blankaspect.common.swing.combobox.ComboBoxRenderer;
 
 //----------------------------------------------------------------------
 
@@ -102,7 +104,7 @@ class LocaleEx
 
 	public static String getLanguageKey(String key)
 	{
-		return StringUtils.removeFromFirst(key, KEY_SEPARATOR_CHAR);
+		return StringUtils.getPrefixFirst(key, KEY_SEPARATOR_CHAR);
 	}
 
 	//------------------------------------------------------------------
@@ -194,12 +196,12 @@ class LocaleEx
 			if (!locale.getLanguage().isEmpty())
 				locales.add(new LocaleEx(locale));
 		}
-		Collections.sort(locales);
+		locales.sort(null);
 		LOCALES = Collections.unmodifiableList(locales);
 	}
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance fields
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
 	private	Locale	locale;

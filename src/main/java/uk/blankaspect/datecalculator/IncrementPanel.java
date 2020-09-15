@@ -35,12 +35,15 @@ import javax.swing.JPanel;
 
 import uk.blankaspect.common.exception.AppException;
 
-import uk.blankaspect.common.gui.FButton;
-import uk.blankaspect.common.gui.FIntegerSpinner;
-import uk.blankaspect.common.gui.FLabel;
-import uk.blankaspect.common.gui.GuiUtils;
+import uk.blankaspect.common.property.Property;
 
-import uk.blankaspect.common.misc.Property;
+import uk.blankaspect.common.swing.button.FButton;
+
+import uk.blankaspect.common.swing.label.FLabel;
+
+import uk.blankaspect.common.swing.misc.GuiUtils;
+
+import uk.blankaspect.common.swing.spinner.FIntegerSpinner;
 
 //----------------------------------------------------------------------
 
@@ -137,7 +140,7 @@ class IncrementPanel
 		//--------------------------------------------------------------
 
 	////////////////////////////////////////////////////////////////////
-	//  Instance fields
+	//  Instance variables
 	////////////////////////////////////////////////////////////////////
 
 		private	String	message;
@@ -557,7 +560,7 @@ class IncrementPanel
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance fields
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
 	private	String				dateFormatKey;
