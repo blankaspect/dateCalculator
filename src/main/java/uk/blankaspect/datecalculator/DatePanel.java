@@ -101,7 +101,7 @@ class DatePanel
 		add(dateField);
 
 		// Button: select date
-		selectButton = new JButton(AppIcon.CALENDAR);
+		selectButton = new JButton(Icons.CALENDAR);
 		selectButton.setToolTipText(selectTooltipString);
 		selectButton.setMargin(DATE_BUTTON_MARGINS);
 		selectButton.setActionCommand(Command.SELECT_DATE);

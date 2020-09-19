@@ -324,7 +324,7 @@ class IncrementPanel
 		resultPanel.add(copyResultButton);
 
 		// Button: set date to result
-		setDateToResultButton = new JButton(AppIcon.ARROW_UP);
+		setDateToResultButton = new JButton(Icons.ARROW_UP);
 		setDateToResultButton.setMargin(RESULT_BUTTON_MARGINS);
 		setDateToResultButton.setToolTipText(SET_DATE_TOOLTIP_STR);
 		setDateToResultButton.setActionCommand(Command.SET_DATE_TO_RESULT);

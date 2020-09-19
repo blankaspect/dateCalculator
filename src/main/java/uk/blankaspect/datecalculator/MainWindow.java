@@ -83,7 +83,7 @@ class MainWindow
 		super(titleStr);
 
 		// Set icons
-		setIconImages(AppIcon.getAppIconImages());
+		setIconImages(Images.APP_ICON_IMAGES);
 
 
 		//----  Tabbed pane
