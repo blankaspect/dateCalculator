@@ -49,16 +49,16 @@ import uk.blankaspect.common.property.Property;
 
 import uk.blankaspect.common.string.StringUtils;
 
-import uk.blankaspect.common.swing.button.FButton;
-import uk.blankaspect.common.swing.button.FixedWidthRadioButton;
+import uk.blankaspect.ui.swing.button.FButton;
+import uk.blankaspect.ui.swing.button.FixedWidthRadioButton;
 
-import uk.blankaspect.common.swing.dialog.NonEditableTextAreaDialog;
+import uk.blankaspect.ui.swing.dialog.NonEditableTextAreaDialog;
 
-import uk.blankaspect.common.swing.label.FLabel;
+import uk.blankaspect.ui.swing.label.FLabel;
 
-import uk.blankaspect.common.swing.misc.GuiUtils;
+import uk.blankaspect.ui.swing.misc.GuiUtils;
 
-import uk.blankaspect.common.swing.spinner.FIntegerSpinner;
+import uk.blankaspect.ui.swing.spinner.FIntegerSpinner;
 
 //----------------------------------------------------------------------
 
@@ -257,7 +257,7 @@ class IntervalPanel
 	//==================================================================
 
 
-	// TEXT AREA DIALOG BOX CLASS
+	// TEXT AREA DIALOG CLASS
 
 
 	private static class TextAreaDialog

@@ -2,7 +2,7 @@
 
 PreferencesDialog.java
 
-Preferences dialog box class.
+Preferences dialog class.
 
 \*====================================================================*/
 
@@ -72,39 +72,39 @@ import uk.blankaspect.common.exception.AppException;
 
 import uk.blankaspect.common.misc.MaxValueMap;
 
-import uk.blankaspect.common.swing.action.KeyAction;
+import uk.blankaspect.ui.swing.action.KeyAction;
 
-import uk.blankaspect.common.swing.border.TitledBorder;
+import uk.blankaspect.ui.swing.border.TitledBorder;
 
-import uk.blankaspect.common.swing.button.FButton;
+import uk.blankaspect.ui.swing.button.FButton;
 
-import uk.blankaspect.common.swing.combobox.BooleanComboBox;
-import uk.blankaspect.common.swing.combobox.FComboBox;
+import uk.blankaspect.ui.swing.combobox.BooleanComboBox;
+import uk.blankaspect.ui.swing.combobox.FComboBox;
 
-import uk.blankaspect.common.swing.container.FixedWidthPanel;
+import uk.blankaspect.ui.swing.container.FixedWidthPanel;
 
-import uk.blankaspect.common.swing.font.FontEx;
-import uk.blankaspect.common.swing.font.FontStyle;
+import uk.blankaspect.ui.swing.font.FontEx;
+import uk.blankaspect.ui.swing.font.FontStyle;
 
-import uk.blankaspect.common.swing.label.FixedWidthLabel;
-import uk.blankaspect.common.swing.label.FLabel;
+import uk.blankaspect.ui.swing.label.FixedWidthLabel;
+import uk.blankaspect.ui.swing.label.FLabel;
 
-import uk.blankaspect.common.swing.list.SingleSelectionList;
+import uk.blankaspect.ui.swing.list.SingleSelectionList;
 
-import uk.blankaspect.common.swing.misc.GuiUtils;
+import uk.blankaspect.ui.swing.misc.GuiUtils;
 
-import uk.blankaspect.common.swing.spinner.IntegerSpinner;
+import uk.blankaspect.ui.swing.spinner.IntegerSpinner;
 
-import uk.blankaspect.common.swing.tabbedpane.FTabbedPane;
+import uk.blankaspect.ui.swing.tabbedpane.FTabbedPane;
 
-import uk.blankaspect.common.swing.text.TextRendering;
+import uk.blankaspect.ui.swing.text.TextRendering;
 
-import uk.blankaspect.common.swing.textfield.IntegerValueField;
+import uk.blankaspect.ui.swing.textfield.IntegerValueField;
 
 //----------------------------------------------------------------------
 
 
-// PREFERENCES DIALOG BOX CLASS
+// PREFERENCES DIALOG CLASS
 
 
 class PreferencesDialog
@@ -1623,7 +1623,7 @@ class PreferencesDialog
 		// Label: locale
 		dateNamesComponents = new EnumMap<>(DateNamesSource.class);
 		for (DateNamesSource dateNamesSource : DateNamesSource.values())
-			dateNamesComponents.put(dateNamesSource, new ArrayList<Component>());
+			dateNamesComponents.put(dateNamesSource, new ArrayList<>());
 
 		JLabel localeLabel = new DatePanelLabel(LOCALE_STR);
 		dateNamesComponents.get(DateNamesSource.LOCALE).add(localeLabel);

@@ -2,7 +2,7 @@
 
 DateNameDialog.java
 
-Date name dialog box class.
+Date name dialog class.
 
 \*====================================================================*/
 
@@ -47,18 +47,18 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import uk.blankaspect.common.swing.action.KeyAction;
+import uk.blankaspect.ui.swing.action.KeyAction;
 
-import uk.blankaspect.common.swing.button.FButton;
+import uk.blankaspect.ui.swing.button.FButton;
 
-import uk.blankaspect.common.swing.label.FLabel;
+import uk.blankaspect.ui.swing.label.FLabel;
 
-import uk.blankaspect.common.swing.misc.GuiUtils;
+import uk.blankaspect.ui.swing.misc.GuiUtils;
 
 //----------------------------------------------------------------------
 
 
-// DATE NAME DIALOG BOX CLASS
+// DATE NAME DIALOG CLASS
 
 
 class DateNameDialog

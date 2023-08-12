@@ -2,7 +2,7 @@
 
 DateFormatDialog.java
 
-Date format dialog box class.
+Date format dialog class.
 
 \*====================================================================*/
 
@@ -54,26 +54,26 @@ import uk.blankaspect.common.date.DateFormat;
 
 import uk.blankaspect.common.exception.AppException;
 
-import uk.blankaspect.common.swing.action.KeyAction;
+import uk.blankaspect.ui.swing.action.KeyAction;
 
-import uk.blankaspect.common.swing.button.FButton;
+import uk.blankaspect.ui.swing.button.FButton;
 
-import uk.blankaspect.common.swing.colour.Colours;
+import uk.blankaspect.ui.swing.colour.Colours;
 
-import uk.blankaspect.common.swing.font.FontStyle;
+import uk.blankaspect.ui.swing.font.FontStyle;
 
-import uk.blankaspect.common.swing.label.FLabel;
+import uk.blankaspect.ui.swing.label.FLabel;
 
-import uk.blankaspect.common.swing.misc.GuiUtils;
+import uk.blankaspect.ui.swing.misc.GuiUtils;
 
-import uk.blankaspect.common.swing.text.TaggedText;
+import uk.blankaspect.ui.swing.text.TaggedText;
 
-import uk.blankaspect.common.swing.textfield.FTextField;
+import uk.blankaspect.ui.swing.textfield.FTextField;
 
 //----------------------------------------------------------------------
 
 
-// DATE FORMAT DIALOG BOX CLASS
+// DATE FORMAT DIALOG CLASS
 
 
 class DateFormatDialog
@@ -217,7 +217,7 @@ class DateFormatDialog
 ////////////////////////////////////////////////////////////////////////
 
 
-	// HELP DIALOG BOX CLASS
+	// HELP DIALOG CLASS
 
 
 	private class HelpDialog

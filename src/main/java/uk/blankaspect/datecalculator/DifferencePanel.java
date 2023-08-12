@@ -2,7 +2,7 @@
 
 DifferencePanel.java
 
-Difference panel class.
+Class: difference panel.
 
 \*====================================================================*/
 
@@ -36,18 +36,18 @@ import javax.swing.JPanel;
 
 import uk.blankaspect.common.exception.AppException;
 
-import uk.blankaspect.common.swing.button.FButton;
-
-import uk.blankaspect.common.swing.label.FLabel;
-
-import uk.blankaspect.common.swing.misc.GuiUtils;
-
 import uk.blankaspect.common.time.Time;
+
+import uk.blankaspect.ui.swing.button.FButton;
+
+import uk.blankaspect.ui.swing.label.FLabel;
+
+import uk.blankaspect.ui.swing.misc.GuiUtils;
 
 //----------------------------------------------------------------------
 
 
-// DIFFERENCE PANEL CLASS
+// CLASS: DIFFERENCE PANEL
 
 
 class DifferencePanel
@@ -59,9 +59,9 @@ class DifferencePanel
 //  Constants
 ////////////////////////////////////////////////////////////////////////
 
-	private static final	int	MILLISECONDS_PER_DAY	= 24 * 60 * 60 * 1000;
+	private static final	int		MILLISECONDS_PER_DAY	= 24 * 60 * 60 * 1000;
 
-	private static final	int	DAYS_RESULT_FIELD_NUM_COLUMNS	= 16;
+	private static final	int		DAYS_RESULT_FIELD_NUM_COLUMNS	= 16;
 
 	private static final	Insets	COPY_BUTTON_MARGINS	= new Insets(2, 4, 2, 4);
 
@@ -89,64 +89,13 @@ class DifferencePanel
 	}
 
 ////////////////////////////////////////////////////////////////////////
-//  Enumerated types
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
-
-	// ERROR IDENTIFIERS
-
-
-	private enum ErrorId
-		implements AppException.IId
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		INVALID_DATE1
-		("The %1 of date 1 is invalid."),
-
-		INVALID_DATE2
-		("The %1 of date 2 is invalid."),
-
-		DATE1_OUT_OF_BOUNDS
-		("The %1 of date 1 must be between %2 and %3."),
-
-		DATE2_OUT_OF_BOUNDS
-		("The %1 of date 2 must be between %2 and %3.");
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private ErrorId(String message)
-		{
-			this.message = message;
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods : AppException.IId interface
-	////////////////////////////////////////////////////////////////////
-
-		public String getMessage()
-		{
-			return message;
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance variables
-	////////////////////////////////////////////////////////////////////
-
-		private	String	message;
-
-	}
-
-	//==================================================================
+	private	DatePanel	startDatePanel;
+	private	DatePanel	endDatePanel;
+	private	ResultField	resultField;
+	private	JButton		subtractButton;
 
 ////////////////////////////////////////////////////////////////////////
 //  Constructors
@@ -154,7 +103,6 @@ class DifferencePanel
 
 	public DifferencePanel()
 	{
-
 		//----  Control panel
 
 		GridBagLayout gridBag = new GridBagLayout();
@@ -182,8 +130,7 @@ class DifferencePanel
 		controlPanel.add(startDateLabel);
 
 		// Panel: start date
-		startDatePanel = new DatePanel(KEY + keyIndex++, SELECT_START_DATE_TOOLTIP_STR,
-									   TODAY_START_TOOLTIP_STR);
+		startDatePanel = new DatePanel(KEY + keyIndex++, SELECT_START_DATE_TOOLTIP_STR, TODAY_START_TOOLTIP_STR);
 		startDatePanel.setObserver(this);
 
 		gbc.gridx = 1;
@@ -214,8 +161,7 @@ class DifferencePanel
 		controlPanel.add(date2Label);
 
 		// Panel: end date
-		endDatePanel = new DatePanel(KEY + keyIndex++, SELECT_END_DATE_TOOLTIP_STR,
-									 TODAY_END_TOOLTIP_STR);
+		endDatePanel = new DatePanel(KEY + keyIndex++, SELECT_END_DATE_TOOLTIP_STR, TODAY_END_TOOLTIP_STR);
 		endDatePanel.setObserver(this);
 
 		gbc.gridx = 1;
@@ -340,7 +286,6 @@ class DifferencePanel
 		gbc.insets = new Insets(3, 0, 0, 0);
 		gridBag.setConstraints(buttonPanel, gbc);
 		add(buttonPanel);
-
 	}
 
 	//------------------------------------------------------------------
@@ -349,7 +294,9 @@ class DifferencePanel
 //  Instance methods : ActionListener interface
 ////////////////////////////////////////////////////////////////////////
 
-	public void actionPerformed(ActionEvent event)
+	@Override
+	public void actionPerformed(
+		ActionEvent	event)
 	{
 		try
 		{
@@ -373,7 +320,9 @@ class DifferencePanel
 //  Instance methods : CompoundDateField.Observer interface
 ////////////////////////////////////////////////////////////////////////
 
-	public void notifyChanged(CompoundDateField source)
+	@Override
+	public void notifyChanged(
+		CompoundDateField	source)
 	{
 		updateButtons();
 	}
@@ -446,20 +395,72 @@ class DifferencePanel
 		long time2 = date2.getTimeInMillis();
 
 		// Calculate difference and display it in result field
-		resultField.setText(Long.toString(Math.round((double)(time2 - time1) /
-																		(double)MILLISECONDS_PER_DAY)));
+		resultField.setText(Long.toString(Math.round((double)(time2 - time1) / (double)MILLISECONDS_PER_DAY)));
 	}
 
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance variables
+//  Enumerated types
 ////////////////////////////////////////////////////////////////////////
 
-	private	DatePanel	startDatePanel;
-	private	DatePanel	endDatePanel;
-	private	ResultField	resultField;
-	private	JButton		subtractButton;
+
+	// ENUMERATION: ERROR IDENTIFIERS
+
+
+	private enum ErrorId
+		implements AppException.IId
+	{
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		INVALID_DATE1
+		("The %1 of date 1 is invalid."),
+
+		INVALID_DATE2
+		("The %1 of date 2 is invalid."),
+
+		DATE1_OUT_OF_BOUNDS
+		("The %1 of date 1 must be between %2 and %3."),
+
+		DATE2_OUT_OF_BOUNDS
+		("The %1 of date 2 must be between %2 and %3.");
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance variables
+	////////////////////////////////////////////////////////////////////
+
+		private	String	message;
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private ErrorId(
+			String	message)
+		{
+			this.message = message;
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods : AppException.IId interface
+	////////////////////////////////////////////////////////////////////
+
+		@Override
+		public String getMessage()
+		{
+			return message;
+		}
+
+		//--------------------------------------------------------------
+
+	}
+
+	//==================================================================
 
 }
 

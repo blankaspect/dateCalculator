@@ -27,6 +27,10 @@ import java.io.IOException;
 
 import java.lang.reflect.Field;
 
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -35,6 +39,8 @@ import java.util.Properties;
 
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
+
+import uk.blankaspect.common.cls.ClassUtils;
 
 import uk.blankaspect.common.date.DateFormat;
 import uk.blankaspect.common.date.DateUtils;
@@ -49,11 +55,11 @@ import uk.blankaspect.common.misc.FilenameSuffixFilter;
 import uk.blankaspect.common.property.Property;
 import uk.blankaspect.common.property.PropertySet;
 
-import uk.blankaspect.common.swing.font.FontEx;
-
-import uk.blankaspect.common.swing.text.TextRendering;
-
 import uk.blankaspect.common.ui.progress.IProgressView;
+
+import uk.blankaspect.ui.swing.font.FontEx;
+
+import uk.blankaspect.ui.swing.text.TextRendering;
 
 //----------------------------------------------------------------------
 
@@ -70,11 +76,11 @@ class AppConfig
 
 	public static final		AppConfig	INSTANCE;
 
-	public static final		int	MAX_NUM_DATE_FORMATS	= 64;
+	public static final		int		MAX_NUM_DATE_FORMATS	= 64;
 
-	private static final	int	VERSION					= 0;
-	private static final	int	MIN_SUPPORTED_VERSION	= 0;
-	private static final	int	MAX_SUPPORTED_VERSION	= 0;
+	private static final	int		VERSION					= 0;
+	private static final	int		MIN_SUPPORTED_VERSION	= 0;
+	private static final	int		MAX_SUPPORTED_VERSION	= 0;
 
 	private static final	String	CONFIG_ERROR_STR	= "Configuration error";
 	private static final	String	CONFIG_DIR_KEY		= Property.APP_PREFIX + "configDir";
@@ -405,7 +411,6 @@ class AppConfig
 		private CPMainWindowLocation()
 		{
 			super(concatenateKeys(Key.GENERAL, Key.MAIN_WINDOW_LOCATION));
-			value = new Point();
 		}
 
 		//--------------------------------------------------------------
@@ -432,7 +437,7 @@ class AppConfig
 		@Override
 		public String toString()
 		{
-			return ((value == null) ? "" : value.x + ", " + value.y);
+			return (value == null) ? "" : value.x + ", " + value.y;
 		}
 
 		//--------------------------------------------------------------
@@ -1160,12 +1165,11 @@ class AppConfig
 	{
 		File file = null;
 
-		// Get directory of JAR file
-		File jarDirectory = null;
+		// Get location of container of class file of application
+		Path containerLocation = null;
 		try
 		{
-			jarDirectory = new File(AppConfig.class.getProtectionDomain().getCodeSource().getLocation().
-																				toURI()).getParentFile();
+			containerLocation = ClassUtils.getClassFileContainer(AppConfig.class);
 		}
 		catch (Exception e)
 		{
@@ -1174,18 +1178,19 @@ class AppConfig
 
 		// Get pathname of configuration directory from properties file
 		String pathname = null;
-		File propertiesFile = new File(jarDirectory, PROPERTIES_FILENAME);
-		if (propertiesFile.isFile())
+		Path propertiesFile = (containerLocation == null) ? Path.of(PROPERTIES_FILENAME)
+														  : containerLocation.resolveSibling(PROPERTIES_FILENAME);
+		if (Files.isRegularFile(propertiesFile, LinkOption.NOFOLLOW_LINKS))
 		{
 			try
 			{
 				Properties properties = new Properties();
-				properties.loadFromXML(new FileInputStream(propertiesFile));
+				properties.loadFromXML(new FileInputStream(propertiesFile.toFile()));
 				pathname = properties.getProperty(CONFIG_DIR_KEY);
 			}
 			catch (IOException e)
 			{
-				throw new FileException(ErrorId.ERROR_READING_PROPERTIES_FILE, propertiesFile);
+				throw new FileException(ErrorId.ERROR_READING_PROPERTIES_FILE, propertiesFile.toFile());
 			}
 		}
 
@@ -1222,7 +1227,7 @@ class AppConfig
 			}
 		}
 
-		// Set configuration file from pathname of configuration directory
+		// Get location of configuration file from pathname of configuration directory
 		else if (!pathname.isEmpty())
 		{
 			file = new File(PathnameUtils.parsePathname(pathname), CONFIG_FILENAME);

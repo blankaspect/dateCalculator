@@ -38,11 +38,11 @@ import javax.swing.JTabbedPane;
 
 import uk.blankaspect.common.exception.ExceptionUtils;
 
-import uk.blankaspect.common.swing.button.FButton;
+import uk.blankaspect.ui.swing.button.FButton;
 
-import uk.blankaspect.common.swing.misc.GuiUtils;
+import uk.blankaspect.ui.swing.misc.GuiUtils;
 
-import uk.blankaspect.common.swing.tabbedpane.FTabbedPane;
+import uk.blankaspect.ui.swing.tabbedpane.FTabbedPane;
 
 //----------------------------------------------------------------------
 
@@ -78,7 +78,6 @@ class MainWindow
 
 	public MainWindow(String titleStr)
 	{
-
 		// Call superclass constructor
 		super(titleStr);
 
@@ -207,15 +206,15 @@ class MainWindow
 
 		// Set location of window
 		AppConfig config = AppConfig.INSTANCE;
-		if (config.isMainWindowLocation())
-			setLocation(GuiUtils.getLocationWithinScreen(this, config.getMainWindowLocation()));
+		setLocation(config.isMainWindowLocation()
+								? GuiUtils.getLocationWithinScreen(this, config.getMainWindowLocation())
+								: GuiUtils.getComponentLocation(this));
 
 		// Set default button
 		getRootPane().setDefaultButton(exitButton);
 
 		// Make window visible
 		setVisible(true);
-
 	}
 
 	//------------------------------------------------------------------
@@ -224,6 +223,7 @@ class MainWindow
 //  Instance methods : ActionListener interface
 ////////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void actionPerformed(ActionEvent event)
 	{
 		String command = event.getActionCommand();

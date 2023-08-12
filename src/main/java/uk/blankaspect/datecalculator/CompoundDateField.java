@@ -39,15 +39,15 @@ import uk.blankaspect.common.number.NumberUtils;
 
 import uk.blankaspect.common.string.StringUtils;
 
-import uk.blankaspect.common.swing.container.DateSelectionPanel;
+import uk.blankaspect.ui.swing.container.DateSelectionPanel;
 
-import uk.blankaspect.common.swing.font.FontUtils;
+import uk.blankaspect.ui.swing.font.FontUtils;
 
-import uk.blankaspect.common.swing.label.FLabel;
+import uk.blankaspect.ui.swing.label.FLabel;
 
-import uk.blankaspect.common.swing.misc.GuiUtils;
+import uk.blankaspect.ui.swing.misc.GuiUtils;
 
-import uk.blankaspect.common.swing.textfield.IntegerField;
+import uk.blankaspect.ui.swing.textfield.IntegerField;
 
 //----------------------------------------------------------------------
 

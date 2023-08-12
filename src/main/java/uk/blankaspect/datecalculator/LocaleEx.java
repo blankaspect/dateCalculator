@@ -28,7 +28,7 @@ import uk.blankaspect.common.misc.IStringKeyed;
 
 import uk.blankaspect.common.string.StringUtils;
 
-import uk.blankaspect.common.swing.combobox.ComboBoxRenderer;
+import uk.blankaspect.ui.swing.combobox.ComboBoxRenderer;
 
 //----------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ class LocaleEx
 		{
 			if (!str.isEmpty())
 			{
-				if (buffer.length() > 0)
+				if (!buffer.isEmpty())
 					buffer.append(KEY_SEPARATOR_CHAR);
 				buffer.append(str);
 			}

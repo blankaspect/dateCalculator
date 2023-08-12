@@ -24,7 +24,7 @@ import javax.swing.JComboBox;
 
 import uk.blankaspect.common.date.DateFormat;
 
-import uk.blankaspect.common.swing.combobox.ComboBoxRenderer;
+import uk.blankaspect.ui.swing.combobox.ComboBoxRenderer;
 
 //----------------------------------------------------------------------
 

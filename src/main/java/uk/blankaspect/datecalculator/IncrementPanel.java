@@ -2,7 +2,7 @@
 
 IncrementPanel.java
 
-Increment panel class.
+Class: increment panel.
 
 \*====================================================================*/
 
@@ -37,18 +37,18 @@ import uk.blankaspect.common.exception.AppException;
 
 import uk.blankaspect.common.property.Property;
 
-import uk.blankaspect.common.swing.button.FButton;
+import uk.blankaspect.ui.swing.button.FButton;
 
-import uk.blankaspect.common.swing.label.FLabel;
+import uk.blankaspect.ui.swing.label.FLabel;
 
-import uk.blankaspect.common.swing.misc.GuiUtils;
+import uk.blankaspect.ui.swing.misc.GuiUtils;
 
-import uk.blankaspect.common.swing.spinner.FIntegerSpinner;
+import uk.blankaspect.ui.swing.spinner.FIntegerSpinner;
 
 //----------------------------------------------------------------------
 
 
-// INCREMENT PANEL CLASS
+// CLASS: INCREMENT PANEL
 
 
 class IncrementPanel
@@ -60,11 +60,11 @@ class IncrementPanel
 //  Constants
 ////////////////////////////////////////////////////////////////////////
 
-	private static final	int	MIN_NUM_DAYS	= 0;
-	private static final	int	MAX_NUM_DAYS	= 999999;
+	private static final	int		MIN_NUM_DAYS	= 0;
+	private static final	int		MAX_NUM_DAYS	= 999999;
 
-	private static final	int	NUM_DAYS_FIELD_LENGTH		= 6;
-	private static final	int	RESULT_FIELD_NUM_COLUMNS	= 24;
+	private static final	int		NUM_DAYS_FIELD_LENGTH		= 6;
+	private static final	int		RESULT_FIELD_NUM_COLUMNS	= 24;
 
 	private static final	Insets	RESULT_BUTTON_MARGINS	= new Insets(2, 4, 2, 4);
 
@@ -96,58 +96,19 @@ class IncrementPanel
 	}
 
 ////////////////////////////////////////////////////////////////////////
-//  Enumerated types
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
-
-	// ERROR IDENTIFIERS
-
-
-	private enum ErrorId
-		implements AppException.IId
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		INVALID_DATE
-		("The %1 is invalid."),
-
-		DATE_OUT_OF_BOUNDS
-		("The %1 must be between %2 and %3.");
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private ErrorId(String message)
-		{
-			this.message = message;
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods : AppException.IId interface
-	////////////////////////////////////////////////////////////////////
-
-		public String getMessage()
-		{
-			return message;
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance variables
-	////////////////////////////////////////////////////////////////////
-
-		private	String	message;
-
-	}
-
-	//==================================================================
+	private	String				dateFormatKey;
+	private	Calendar			result;
+	private	DatePanel			datePanel;
+	private	FIntegerSpinner		daysSpinner;
+	private	DateFormatComboBox	dateFormatComboBox;
+	private	ResultField			resultField;
+	private	JButton				copyResultButton;
+	private	JButton				setDateToResultButton;
+	private	JButton				addButton;
+	private	JButton				subtractButton;
 
 ////////////////////////////////////////////////////////////////////////
 //  Constructors
@@ -155,7 +116,6 @@ class IncrementPanel
 
 	public IncrementPanel()
 	{
-
 		//----  Control panel
 
 		GridBagLayout gridBag = new GridBagLayout();
@@ -401,7 +361,6 @@ class IncrementPanel
 
 		// Add listeners
 		dateFormatKey = AppConfig.INSTANCE.addDateFormatObserver(this);
-
 	}
 
 	//------------------------------------------------------------------
@@ -443,7 +402,9 @@ class IncrementPanel
 //  Instance methods : CompoundDateField.Observer interface
 ////////////////////////////////////////////////////////////////////////
 
-	public void notifyChanged(CompoundDateField source)
+	@Override
+	public void notifyChanged(
+		CompoundDateField	source)
 	{
 		updateButtons();
 	}
@@ -454,7 +415,9 @@ class IncrementPanel
 //  Instance methods : Property.IObserver interface
 ////////////////////////////////////////////////////////////////////////
 
-	public void propertyChanged(Property property)
+	@Override
+	public void propertyChanged(
+		Property	property)
 	{
 		if (property.getKey().equals(dateFormatKey))
 		{
@@ -490,7 +453,8 @@ class IncrementPanel
 
 	//------------------------------------------------------------------
 
-	private void incrementDate(int numDays)
+	private void incrementDate(
+		int	numDays)
 		throws AppException
 	{
 		// Validate date
@@ -560,19 +524,60 @@ class IncrementPanel
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance variables
+//  Enumerated types
 ////////////////////////////////////////////////////////////////////////
 
-	private	String				dateFormatKey;
-	private	Calendar			result;
-	private	DatePanel			datePanel;
-	private	FIntegerSpinner		daysSpinner;
-	private	DateFormatComboBox	dateFormatComboBox;
-	private	ResultField			resultField;
-	private	JButton				copyResultButton;
-	private	JButton				setDateToResultButton;
-	private	JButton				addButton;
-	private	JButton				subtractButton;
+
+	// ENUMERATION: ERROR IDENTIFIERS
+
+
+	private enum ErrorId
+		implements AppException.IId
+	{
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		INVALID_DATE
+		("The %1 is invalid."),
+
+		DATE_OUT_OF_BOUNDS
+		("The %1 must be between %2 and %3.");
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance variables
+	////////////////////////////////////////////////////////////////////
+
+		private	String	message;
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private ErrorId(
+			String	message)
+		{
+			this.message = message;
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods : AppException.IId interface
+	////////////////////////////////////////////////////////////////////
+
+		@Override
+		public String getMessage()
+		{
+			return message;
+		}
+
+		//--------------------------------------------------------------
+
+	}
+
+	//==================================================================
 
 }
 

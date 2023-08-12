@@ -34,9 +34,9 @@ import uk.blankaspect.common.date.Date;
 
 import uk.blankaspect.common.misc.ModernCalendar;
 
-import uk.blankaspect.common.swing.button.FButton;
+import uk.blankaspect.ui.swing.button.FButton;
 
-import uk.blankaspect.common.swing.dialog.DateSelectionDialog;
+import uk.blankaspect.ui.swing.dialog.DateSelectionDialog;
 
 //----------------------------------------------------------------------
 
