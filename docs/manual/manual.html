@@ -1,0 +1,1520 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+   PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+   "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html
+   xmlns="http://www.w3.org/1999/xhtml"
+   xml:lang="en">
+
+  <head>
+    <meta
+       http-equiv="content-type"
+       content="application/xhtml+xml;charset=UTF-8"/>
+    <meta
+       content="initial-scale=1"
+       name="viewport"/>
+    <title>DateCalculator : Manual</title>
+    <link
+       href="style/blankaspect-common.css"
+       rel="stylesheet"
+       type="text/css"/>
+    <link
+       href="style/blankaspect-manual.css"
+       rel="stylesheet"
+       type="text/css"/>
+    <link
+       href="style/dateCalculator-manual.css"
+       rel="stylesheet"
+       type="text/css"/>
+    <link
+       href="images/icon-48x48.png"
+       rel="icon"/>
+    <script
+       src="scripts/Toc.js"
+       type="text/javascript">
+    </script>
+    <script
+       src="scripts/init.js"
+       type="text/javascript">
+    </script>
+  </head>
+
+  <body>
+
+    <!-- Title -->
+
+    <div id="title">
+      <div>
+        <img alt="Icon" src="images/icon-48x48.png"/>
+      </div>
+      <div>
+        DateCalculator : manual
+      </div>
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- Table of contents -->
+
+    <div class="section">
+      <h2 id="toc">Table of contents</h2>
+      <div id="tocRoot">
+        <div class="wrap" id="tocPlaceholder">
+          You must have JavaScript enabled in your browser to generate the table of contents.
+        </div>
+      </div>
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- Introduction -->
+
+    <div class="section">
+      <h2 id="section1">1&nbsp; Introduction</h2>
+      <p class="tocLink">
+        [ <a href="#toc">Table of contents</a> ]
+      </p>
+
+      <p class="wrap">
+        DateCalculator is a Java application that can perform three kinds of computation on
+        calendar dates:
+      </p>
+      <ul class="list">
+        <li class="spaced">
+          <div><i>Increment</i></div>
+          <div class="wrap">
+            Add a number of days to a date or subtract a number of days from a date (eg, find
+            the date 100 days after today).
+          </div>
+        </li>
+        <li class="spaced">
+          <div><i>Difference</i></div>
+          <div class="wrap">
+            Calculate the number of days between two dates (eg, find the number of days from the
+            start of next week to the end of the year).
+          </div>
+        </li>
+        <li class="spaced">
+          <div><i>Interval</i></div>
+          <div class="wrap">
+            Generate a sequence of dates with a given number of days between each successive
+            pair of dates (eg, make a list of all the Saturdays in the next four years).
+          </div>
+        </li>
+      </ul>
+      <p class="wrap">
+        DateCalculator uses the <a class="external"
+        href="https://en.wikipedia.org/wiki/Gregorian_calendar">Gregorian calendar</a> for all
+        dates, and it accepts input dates between the years 1600 <abbr
+        title="Common Era (or AD)">CE</abbr> and 3999 <abbr
+        title="Common Era (or AD)">CE</abbr>.  Dates output by DateCalculator are displayed in
+        user-defined formats.  In those formats, the names of days and months may be obtained
+        from a Java locale (a language, or a language and a country) or they may be
+        user-defined.
+      </p>
+
+      <h3 id="section1-1">1.1&nbsp; Licence</h3>
+
+      <p class="wrap">
+        DateCalculator is made available under two licences:
+      </p>
+      <ul class="list">
+        <li class="spaced wrap">
+          The contents of the <code>uk.blankaspect.datecalculator</code> package (including
+          resources) may be used under the terms of version 3 of the <a class="external"
+          href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License</a>.
+        </li>
+        <li class="spaced wrap">
+          All other contents of the GitHub <a
+          href="https://github.com/blankaspect/dateCalculator">blankaspect/dateCalculator</a>
+          repository may be used under the terms of the <a class="external"
+          href="https://mit-license.org/">MIT License</a>.
+        </li>
+      </ul>
+
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- Building and running the application -->
+
+    <div class="section">
+      <h2 id="section2">2&nbsp; Building and running the application</h2>
+      <p class="tocLink">
+        [ <a href="#toc">Table of contents</a> ]
+      </p>
+
+      <p class="wrap">
+        This section assumes that you have some experience of building and running a Java
+        application.
+      </p>
+
+      <h3 id="section2-1">2.1&nbsp; Building the application</h3>
+
+      <p class="wrap">
+        A Java Development Kit (JDK) that supports Java 17, such as <a class="external"
+        href="https://adoptium.net/">Eclipse Temurin from Adoptium</a>, is required to build
+        DateCalculator.
+      </p>
+      <p class="wrap">
+        The <code>src</code> directory of the distribution contains all the source code and
+        resources that constitute the application; there are no external dependencies.  The
+        directory conforms to the Maven standard directory layout: the source code is in
+        <code>src/main/java</code> and the resources are in <code>src/main/resources</code>.
+      </p>
+      <p class="wrap">
+        The supplied Kotlin-DSL-based <a class="external" href="https://gradle.org/">Gradle</a>
+        build script, <code>build.gradle.kts</code>, modifies the <code>compileJava</code> and
+        <code>jar</code> tasks (provided by the <code>java</code> plug-in) to compile the
+        application and to create an executable JAR file for it.
+      </p>
+
+      <h3 id="section2-2">2.2&nbsp; Running the application</h3>
+
+      <p class="wrap">
+        The supplied Kotlin-DSL-based Gradle build script, <code>build.gradle.kts</code>,
+        defines two tasks that may be used to run DateCalculator:
+      </p>
+      <dl class="basic">
+        <dt>runMain</dt>
+        <dd class="wrap">
+          Runs the main class from the class files that were generated by the
+          <code>compileJava</code> task.
+        </dd>
+        <dt>runJar</dt>
+        <dd class="wrap">
+          Runs the executable JAR that was generated by the <code>jar</code> task.
+        </dd>
+      </dl>
+      <p class="wrap">
+        Both tasks extend the <code>JavaExec</code> task.
+      </p>
+
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- Configuration -->
+
+    <div class="section">
+      <h2 id="section3">3&nbsp; Configuration</h2>
+      <p class="tocLink">
+        [ <a href="#toc">Table of contents</a> ]
+      </p>
+
+      <p class="wrap">
+        When it starts up, DateCalculator is configured with <i>configuration properties</i>
+        that are read from two sources: the <a href="#section3-1">command line</a> of the Java
+        launcher and a <a href="#section3-2">configuration file</a> whose location may be
+        explicitly specified.  If the same property is specified on the command line and in a
+        configuration file, the value from the configuration file takes precedence.
+      </p>
+      <p class="wrap">
+        The recommended method of setting the properties in a configuration file is with the <a
+        class="command" href="#section7-1">Preferences</a> command.  For command-line
+        properties, which must be edited manually, the form of the property values is given in
+        an <a href="#sectionB">appendix</a>, and it can also be inferred by generating a
+        configuration file with the desired values and inspecting the contents of the file.
+      </p>
+
+      <h3 id="section3-1">3.1&nbsp; Command-line properties</h3>
+
+      <p class="wrap">
+        When DateCalculator is run, configuration properties may be passed to the
+        <code>java</code> launcher on the command line as system properties; eg,
+        <code>-Dapp.general.mainWindowLocation=&quot;100, 0&quot;</code>.  DateCalculator&apos;s
+        command-line configuration properties all have the prefix <code>app.</code> . A list of
+        all the properties that are recognised by DateCalculator is given in an <a
+        href="#sectionB">appendix</a>.
+      </p>
+      <p class="wrap">
+        System properties can be added to the <a href="#section2-2">two supplied Gradle
+        tasks</a>, <code>runMain</code> and <code>runJar</code>, with the
+        <code>systemProperties(Map&lt;String, ?&gt;)</code> method.
+      </p>
+      <p class="wrap">
+        One particular property, <span class="configProperty">app.configDir</span>, is used to
+        specify the directory that contains a configuration file, as <a
+        href="#section3-2-1">described below</a>.
+      </p>
+
+      <h3 id="section3-2">3.2&nbsp; Configuration file</h3>
+
+      <p class="wrap">
+        The configuration file is named <code>dateCalculator-config.xml</code>.  DateCalculator
+        doesn&apos;t require a configuration file: it uses a default value for any configuration
+        property that is missing from the source(s) of configuration.  Similarly, if it finds a
+        property value to be invalid, DateCalculator will display a message to this effect and
+        use the default value of the property.  If the configuration file contains a property
+        that was specified on the command line, the value from the configuration file is used.
+      </p>
+      <p class="wrap">
+        If the configuration has changed when you exit the application normally (ie, using the
+        <a class="command" href="#section7-2">Exit</a> command or an equivalent), DateCalculator
+        will save its configuration to a configuration file.  If a configuration file was read
+        on startup, it will overwrite that file; otherwise, it will write a configuration file
+        to the default directory described above, unless the value of the <span
+        class="configProperty">app.configDir</span> property was an empty string.
+      </p>
+      <p class="wrap">
+        A configuration file can be written explicitly with the <span class="command">Save
+        configuration</span> command within the <span class="component">Preferences</span>
+        dialog.
+      </p>
+
+      <h4 id="section3-2-1">3.2.1&nbsp; Location of the configuration file</h4>
+      <p class="wrap">
+        When it starts up, DateCalculator is informed of the location of the configuration file
+        with the <span class="configProperty">app.configDir</span> property.  The value of the
+        property may contain <a href="#sectionA">special constructs</a> for system properties,
+        environment variables and the user&apos;s home directory.
+      </p>
+      <p class="noBottomMargin wrap">
+        The <span class="configProperty">app.configDir</span> property may be set in two ways:
+      </p>
+      <ul class="continuationList">
+        <li class="wrap">
+          on the command line that runs the <code>java</code> launcher, or
+        </li>
+        <li class="wrap">
+          in a file named <code>dateCalculator-properties.xml</code> that resides in the same
+          directory as the <code>dateCalculator.jar</code> JAR file.
+        </li>
+      </ul>
+      <p class="wrap">
+        The <code>dateCalculator-properties.xml</code> file is a legacy from the time when
+        DateCalculator was distributed as a JAR file with an installer; the properties file was
+        written by the installer.  If you create a properties file, it should have the following
+        form, with the example pathname replaced by the actual pathname:
+      </p>
+      <pre class="codeFragment">
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;!DOCTYPE properties SYSTEM &quot;http://java.sun.com/dtd/properties.dtd&quot;&gt;
+&lt;properties&gt;
+&lt;entry key=&quot;app.configDir&quot;&gt;/home/slothrop/.blankaspect/dateCalculator&lt;/entry&gt;
+&lt;/properties&gt;</pre>
+
+      <p class="wrap">
+        If the <span class="configProperty">app.configDir</span> property is set both on the
+        command line and in the properties file, the value in the properties file takes
+        precedence.
+      </p>
+
+      <p class="wrap">
+        The existence and value of the <span class="configProperty">app.configDir</span>
+        property determines the locations that are searched for a configuration file:
+      </p>
+      <ul class="list">
+        <li class="spaced wrap">
+          If the <span class="configProperty">app.configDir</span> property exists and the
+          property value is an empty string, DateCalculator will start without a configuration
+          file.  No configuration file will be written when the application exits.
+        </li>
+        <li class="spaced wrap">
+          If the <span class="configProperty">app.configDir</span> property exists and the
+          property value is not empty, DateCalculator will look for a configuration file in the
+          directory specified by the property.  An error message is displayed if a configuration
+          file is not found in the specified directory.
+        </li>
+        <li class="spaced">
+          <div class="wrap">
+            If the <span class="configProperty">app.configDir</span> property does not exist,
+            DateCalculator will look for a configuration file at two other locations:
+          </div>
+          <ol class="list">
+            <li class="spaced">
+              <div><i>The current working directory</i></div>
+              <div class="wrap">
+                The current working directory, which is denoted by the environment variable
+                <code>$PWD</code> on Linux/UNIX systems, depends on the system and the way in
+                which DateCalculator was run.
+              </div>
+            </li>
+            <li class="spaced" id="defaultDirectory">
+              <div><i>The default directory</i></div>
+              <div class="wrap">
+                On Linux/UNIX systems, the default directory is
+                <code>$HOME/.blankaspect/dateCalculator</code>, where <code>$HOME</code> is the
+                environment variable that denotes the user&apos;s home directory.  On Windows
+                systems, the default directory is
+                <code>%APPDATA%\blankaspect\dateCalculator</code>, where <code>%APPDATA%</code>
+                is an environment variable.
+              </div>
+            </li>
+          </ol>
+        </li>
+      </ul>
+
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- Locales -->
+
+    <div class="section">
+      <h2 id="section4">4&nbsp; Locales</h2>
+      <p class="tocLink">
+        [ <a href="#toc">Table of contents</a> ]
+      </p>
+
+      <p class="wrap">
+        A Java runtime environment has one or more <i>locales</i>, which are a mechanism by
+        which a Java application can obtain information to adapt itself for different languages
+        and regions &mdash; a practice known as <i>localisation</i>.  This section describes the
+        few ways in which DateCalculator uses the information provided by locales.
+      </p>
+      <p class="wrap">
+        Localisation in DateCalculator is confined to the names of months, the names of days of
+        the week and the identity of the first day of the week.  Western numerals &mdash; also
+        called Arabic numerals in English &mdash; are used exclusively for numbers in dates.
+        More broadly, the user interface has no support for languages that are not written
+        left-to-right, top-to-bottom.
+      </p>
+
+      <h3 id="section4-1">4.1&nbsp; The default locale</h3>
+
+      <p class="noBottomMargin wrap">
+        When a Java application starts up, the Java environment sets a <i>default locale</i>,
+        which is determined from the operating system.  DateCalculator uses this locale for
+      </p>
+      <ul class="continuationList">
+        <li class="wrap">
+          the (abbreviated) names of months and days of the week in <a
+          href="#section6-2-3">date-selection dialogs</a>,
+        </li>
+        <li class="wrap">
+          the default value of the <a href="#cp-date-firstDayOfWeek">first day of the week</a>,
+        </li>
+        <li class="wrap">
+          the names that are set by the <span class="command">Set from locale</span> command in
+          the dialogs that are used to edit the user-defined names of months and days of the
+          week from the <span class="component">Preferences</span> dialog.
+        </li>
+      </ul>
+
+      <h3 id="section4-2">4.2&nbsp; The locale for names of months and days of the week</h3>
+
+      <p class="wrap">
+        A locale may be selected as the source of the names of months and days of the week that
+        are used by DateCalculator&apos;s <a href="#section5-3">date formats</a>.  This locale
+        may be different from the <a href="#section4-1">default locale</a>.
+      </p>
+
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- Calendars and dates -->
+
+    <div class="section">
+      <h2 id="section5">5&nbsp; Calendars and dates</h2>
+      <p class="tocLink">
+        [ <a href="#toc">Table of contents</a> ]
+      </p>
+
+      <h3 id="section5-1">5.1&nbsp; The Gregorian calendar</h3>
+
+      <p class="wrap">
+        DateCalculator uses a pure <a class="external"
+        href="https://en.wikipedia.org/wiki/Gregorian_calendar">Gregorian calendar</a> for all
+        dates: there is no point at which dates switch to the Gregorian calendar from its
+        predecessor, the <a class="external"
+        href="https://en.wikipedia.org/wiki/Julian_calendar">Julian calendar</a>.  This
+        simplifies the handling of dates by DateCalculator at the cost of reducing its
+        usefulness for historical dates.
+      </p>
+      <p class="wrap">
+        The Gregorian calendar was adopted at different times by different countries and
+        regions.  The Wikipedia article on the Gregorian calendar has two pieces of information
+        that allow you to work out, for a given year and country, the number of days that you
+        should subtract from a Gregorian date to convert it to a Julian date:
+      </p>
+      <ul class="list">
+        <li class="wrap">
+          a timeline for the adoption of the calendar by various countries, ranging from 1582,
+          when the calendar was introduced by the eponymous Pope Gregory XIII, to 1923, and
+        </li>
+        <li class="wrap">
+          a table of the number of days&apos; difference between the Julian and Gregorian
+          calendars since the introduction of the latter.
+        </li>
+      </ul>
+      <p class="wrap">
+        According to Wikipedia, there were some local complications in the transition from the
+        Julian to the Gregorian calendar, so the conversion between calendars will not be
+        straightforward in all cases.
+      </p>
+      <p class="wrap">
+        DateCalculator accepts input dates between the years 1600 <abbr
+        title="Common Era (or AD)">CE</abbr> and 3999 <abbr
+        title="Common Era (or AD)">CE</abbr>, though it will display results outside this range.
+      </p>
+
+      <h3 id="section5-2">5.2&nbsp; Names of months and days of the week</h3>
+
+      <p class="wrap">
+        DateCalculator uses names of months and days of the week in two places: the <a
+        href="#section6-2-3">date-selection dialog</a> and the formatted dates that are output
+        by the <i>increment</i> and <i>interval</i> functions.
+      </p>
+      <p class="wrap">
+        In the date-selection dialog, the names of months and days of the week are those for the
+        <a href="#section4-1">default locale</a>.  The names of months are abbreviated to the
+        first three or more characters; the names of days are abbreviated to the first two or
+        more characters.
+      </p>
+      <p class="wrap">
+        The sources of the formatted dates are described in the section on <a
+        href="#section5-3">date formats</a>.
+      </p>
+
+      <h3 id="section5-3">5.3&nbsp; Date formats</h3>
+
+      <p class="wrap">
+        The dates that are output by DateCalculator&apos;s <i>increment</i> and <i>interval</i>
+        functions are formatted with one of the <a href="#cp-date-format">user-defined
+        formats</a>.  A date format consists of a pattern, which determines how the date will
+        appear, and a name, which is just an alias for the pattern, to allow you to select it
+        more easily from a list.
+      </p>
+      <p class="wrap">
+        A pattern can contain two kinds of element: literal text and fields.  The formatter
+        leaves literal text unchanged but replaces fields with the appropriate component of the
+        date &mdash; year, month or day.  The month and day fields can be either a number or a
+        name.  The width (number of characters) and alignment (left or right) of a field can be
+        specified.  A field whose content is smaller than its specified width will be padded
+        with spaces or, if it is a number field, optionally with zeros.  A field whose content
+        is larger than its specified width will be truncated.
+      </p>
+      <p class="wrap">
+        For a name field, the names of months and days of the week are obtained either from a <a
+        href="#cp-date-namesLocale">selected locale</a> or, if the names from the locale are not
+        acceptable, from lists of user-defined names of <a href="#cp-date-monthName">months</a>
+        and <a href="#cp-date-dayName">days of the week</a>.  The <a class="configProperty"
+        href="#cp-date-namesSource">date.namesSource</a> configuration property determines
+        whether the names are obtained from a locale or whether they&apos;re user-defined.
+      </p>
+      <p class="wrap">
+        In a pattern, a field starts with a <code>%</code> character.  This may be followed by
+        the special characters <code>[</code> or <code>]</code>, which denote left and right
+        alignment respectively, and by a decimal number to denote the width of the field.
+        (Fields are left-aligned by default, so the left-alignment prefix is unnecessary.)  The
+        field ends with a letter that identifies the kind of field.
+      </p>
+      <p class="wrap">
+        A maximum of 64 date formats can be defined.  Neither the name nor the pattern of a date
+        format may contain the string <code>##</code> because it is used in the configuration
+        property as the separator between the name and pattern.
+      </p>
+      <p class="wrap">
+        The following tables describe the form and meaning of fields in a pattern:
+      </p>
+
+      <table class="dataStructure">
+        <tr>
+          <th colspan="2">Field identifiers</th>
+        </tr>
+        <tr>
+          <td class="key">y</td>
+          <td>year</td>
+        </tr>
+        <tr>
+          <td class="key">m</td>
+          <td>month (number)</td>
+        </tr>
+        <tr>
+          <td class="key">M</td>
+          <td>month (name)</td>
+        </tr>
+        <tr>
+          <td class="key">d</td>
+          <td>day (number)</td>
+        </tr>
+        <tr>
+          <td class="key">D</td>
+          <td>day (name)</td>
+        </tr>
+      </table>
+
+      <table class="dataStructure">
+        <tr>
+          <th colspan="2">Field prefixes</th>
+        </tr>
+        <tr>
+          <td class="subheader wrap" colspan="2">
+            <span class="variable">n</span> is a decimal number between 1 and 999 denoting the
+            width of the field in characters
+          </td>
+        </tr>
+        <tr>
+          <td class="key">%</td>
+          <td>implicit width</td>
+        </tr>
+        <tr>
+          <td class="key">%<span class="variable">n</span></td>
+          <td class="wrap">
+            width <span class="variable">n</span>, left-aligned (ie, padded to the right with
+            spaces)
+          </td>
+        </tr>
+        <tr>
+          <td class="key">%0<span class="variable">n</span></td>
+          <td class="wrap">
+            width <span class="variable">n</span>, padded with leading zeros
+          </td>
+        </tr>
+        <tr>
+          <td class="key">%[<span class="variable">n</span></td>
+          <td class="wrap">
+            width <span class="variable">n</span>, left-aligned (ie, padded to the right with
+            spaces)
+          </td>
+        </tr>
+        <tr>
+          <td class="key">%]<span class="variable">n</span></td>
+          <td class="wrap">
+            width <span class="variable">n</span>, right-aligned (ie, padded to the left with
+            spaces)
+          </td>
+        </tr>
+      </table>
+
+      <table class="dataStructure">
+        <tr>
+          <th colspan="2">Other</th>
+        </tr>
+        <tr>
+          <td class="key">%%</td>
+          <td>literal % character</td>
+        </tr>
+      </table>
+
+      <h4 id="section5-3-1">5.3.1&nbsp; Examples of date formats</h4>
+      <p class="wrap">
+        The following examples are all representations of the date 4 October 1986.  The names of
+        months and days of the week are those for the <code>en-GB</code> locale.
+      </p>
+
+      <table class="dataStructure" id="dateFormatExamples">
+        <tr>
+          <th>Pattern</th>
+          <th>Formatted output</th>
+        </tr>
+        <tr>
+          <td class="pattern">%04y-%02m-%02d</td>
+          <td class="output"><code>1986-10-04</code></td>
+        </tr>
+        <tr>
+          <td class="pattern">%D,&nbsp;%d&nbsp;%M&nbsp;%y</td>
+          <td class="output"><code>Saturday,&nbsp;4&nbsp;October&nbsp;1986</code></td>
+        </tr>
+        <tr>
+          <td class="pattern">%2d&nbsp;%3M&nbsp;%y</td>
+          <td class="output"><code>&nbsp;4 Oct&nbsp;1986</code></td>
+        </tr>
+        <tr>
+          <td class="pattern">%m/%d/%y</td>
+          <td class="output"><code>10/4/1986</code></td>
+        </tr>
+        <tr>
+          <td class="pattern">&quot;%3D&nbsp;%3M&nbsp;%02d&quot;</td>
+          <td class="output"><code>&quot;Sat&nbsp;Oct&nbsp;04&quot;</code></td>
+        </tr>
+        <tr>
+          <td class="pattern">%02d/%02m/%02y&nbsp;(%D)</td>
+          <td class="output"><code>04/10/86&nbsp;(Saturday)</code></td>
+        </tr>
+        <tr>
+          <td class="pattern">%02d.%02m.%02y&nbsp;[%]10D]</td>
+          <td class="output"><code>04.10.86&nbsp;[&nbsp;&nbsp;Saturday]</code></td>
+        </tr>
+        <tr>
+          <td class="pattern">%2d%%%2m%%%4y</td>
+          <td class="output"><code>&nbsp;4%10%1986</code></td>
+        </tr>
+      </table>
+
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- The display -->
+
+    <div class="section">
+      <h2 id="section6">6&nbsp; The display</h2>
+      <p class="tocLink">
+        [ <a href="#toc">Table of contents</a> ]
+      </p>
+
+      <h3 id="section6-1">6.1&nbsp; The main window</h3>
+
+      <p class="wrap">
+        DateCalculator&apos;s main window is equivalent to a dialog box.  The size of the window
+        cannot be changed directly, though it may change as a side-effect of changing the fonts
+        in the user preferences.
+      </p>
+      <p class="wrap">
+        The main window is tabbed, with a tab for each of the three functions of the
+        application: <i>Increment</i> (adding a number of days to a date or subtracting a number
+        of days from a date), <i>Difference</i> (calculating the number of days between two
+        dates) and <i>Interval</i> (generating a list of dates with a specified number of days
+        between successive pairs of dates).
+      </p>
+
+      <h4 id="section6-1-1">6.1.1&nbsp; The <span class="component">Increment</span> tab</h4>
+      <p class="wrap">
+        The <i>increment</i> function adds a number of days to a date or subtracts a number of
+        days from a date.
+      </p>
+      <p class="wrap">
+        The <span class="component">Date</span> field, a <a href="#section6-2-2">compound date
+        field</a>, holds the input date.  The button to the right of the field brings up a <a
+        href="#section6-2-3">date-selection dialog</a> in which you can select the date.  The
+        <span class="component">Today</span> button to its right sets the date to the current
+        date.
+      </p>
+      <p class="wrap">
+        The <span class="component">Days</span> spinner specifies the number of days that will
+        be added to or subtracted from the date in the <span class="component">Date</span>
+        field.
+      </p>
+      <p class="wrap">
+        The <span class="component">Date format</span> drop-down list selects the format that is
+        used for the result.  The items in the list are the names of the <a
+        href="#cp-date-format">date formats</a>.  When the list is displayed, the pattern
+        associated with an item in the list is displayed as a tooltip when the mouse cursor
+        hovers over the item.
+      </p>
+      <p class="wrap">
+        The result of the calculation is displayed in the <span class="component">Result</span>
+        field.  The <span class="component">Copy</span> button to the right of the field copies
+        the result to the system clipboard.  The button with an upward-pointing arrow to the
+        right of the <span class="component">Copy</span> button sets the <span
+        class="component">Date</span> field to the result, facilitating chained calculations.
+      </p>
+      <p class="wrap">
+        The buttons for the <span class="command">Add</span> and <span
+        class="command">Subtract</span> commands are enabled when none of the three subfields of
+        the <span class="component">Date</span> field is empty.  When the <span
+        class="command">Add</span> or <span class="command">Subtract</span> command is issued,
+        the <span class="component">Date</span> field is validated and an error message
+        displayed if the date is invalid.  If the date is valid, the addition or subtraction is
+        performed and the <span class="component">Result</span> field is updated with the
+        result.
+      </p>
+
+      <h4 id="section6-1-2">6.1.2&nbsp; The <span class="component">Difference</span> tab</h4>
+      <p class="wrap">
+        The <i>difference</i> function calculates the number of days from one date to another.
+      </p>
+      <p class="wrap">
+        The <span class="component">Start date</span> and <span class="component">End
+        date</span> fields are <a href="#section6-2-2">compound date fields</a> that hold,
+        respectively, the start and end dates.  The button to the right of each field brings up
+        a <a href="#section6-2-3">date-selection dialog</a> in which you can select the date.
+        The <span class="component">Today</span> button to its right sets the date to the
+        current date.
+      </p>
+      <p class="wrap">
+        The result of the calculation &mdash; the number of days from the start date to the end
+        date &mdash; is displayed in the <span class="component">Result</span> field; if the
+        start date is after the end date, the result will be negative.  The <span
+        class="component">Copy</span> button to the right of the field copies the result to the
+        system clipboard.
+      </p>
+      <p class="wrap">
+        The button for the <span class="command">Subtract</span> command is enabled when none of
+        the subfields of the <span class="component">Start date</span> and <span
+        class="component">End date</span> fields is empty.  When the <span
+        class="command">Subtract</span> command is issued, the <span class="component">Start
+        date</span> and <span class="component">End date</span> fields are validated and an
+        error message displayed if either date is invalid.  If the dates are valid, the
+        subtraction is performed and the <span class="component">Result</span> field is updated
+        with the result.
+      </p>
+
+      <h4 id="section6-1-3">7.1.3&nbsp; The <span class="component">Interval</span> tab</h4>
+      <p class="wrap">
+        The <i>interval</i> function generates a sequence of dates with a given number of days
+        between each successive pair of dates.
+      </p>
+      <p class="wrap">
+        The <span class="component">Start date</span> field, a <a href="#section6-2-2">compound
+        date field</a>, holds the first date in the sequence.  The button to the right of the
+        field brings up a <a href="#section6-2-3">date-selection dialog</a> in which you can
+        select the date.  The <span class="component">Today</span> button to its right sets the
+        date to the current date.
+      </p>
+      <p class="wrap">
+        The <span class="component">Interval</span> spinner specifies the number of days between
+        successive dates in the sequence.
+      </p>
+      <p class="wrap">
+        There are three ways to specify the end of the sequence:
+      </p>
+      <ul class="list">
+        <li class="wrap">
+          the number of intervals in the sequence,
+        </li>
+        <li class="wrap">
+          the number of days from the start to the end of the sequence, or
+        </li>
+        <li class="wrap">
+          the date at the end of the sequence.
+        </li>
+      </ul>
+      <p class="wrap">
+        The choice is controlled by radio buttons, each of which enables its adjacent components
+        when it is selected.
+      </p>
+      <p class="wrap">
+        The <span class="component">Date format</span> drop-down list selects the format that is
+        used for the result.  The items in the list are the names of the <a
+        href="#cp-date-format">date formats</a>.  When the list is displayed, the pattern
+        associated with an item in the list is displayed as a tooltip when the mouse cursor
+        hovers over the item.
+      </p>
+      <p class="wrap">
+        The button for the <span class="command">Generate</span> command is enabled when none of
+        the subfields of the <span class="component">Start date</span> field &mdash; and the
+        subfields of the <span class="component">End date</span> field, if it is enabled &mdash;
+        is empty.  When the <span class="command">Generate</span> command is issued, the date
+        fields are validated and an error message displayed if a date is invalid.  If the dates
+        are valid, the sequence of dates is generated and displayed in the selected format, one
+        date per line, in a dialog box.  In the results dialog, the <span
+        class="command">Copy</span> command copies the list of dates to the system clipboard.
+      </p>
+
+      <h3 id="section6-2">7.2&nbsp; Graphical components</h3>
+
+      <p class="wrap">
+        DateCalculator&apos;s user interface has some non-standard graphical components and some
+        standard components that have bespoke features.
+      </p>
+
+      <h4 id="section6-2-1">7.2.1&nbsp; Spinner</h4>
+      <p class="wrap">
+        A <i>spinner</i> is a graphical component for editing a numerical value.  It consists of
+        a text field adjacent to a pair of small buttons.  The value in the text field may be
+        edited manually, or it may be incremented and decremented by one of the following
+        methods:
+      </p>
+      <ul class="list">
+        <li class="wrap">
+          clicking on the small up/down buttons;
+        </li>
+        <li class="wrap">
+          pressing the up/down arrow keys;
+        </li>
+        <li class="wrap">
+          rotating the mouse wheel with the mouse cursor over the spinner when the text field
+          has keyboard focus (ie, the caret is displayed in the field).
+        </li>
+      </ul>
+      <p class="wrap">
+        Using the last two methods, the amount by which the value is incremented or decremented
+        can be modified by holding down the Ctrl, Shift or Ctrl+Shift keys, which correspond to
+        increments of 10, 100 and 1000 respectively.
+      </p>
+
+      <h4 id="section6-2-2">7.2.2&nbsp; Compound date field</h4>
+      <p class="wrap">
+        A <i>compound date field</i> is a group of three text fields for editing a date.  From
+        left to right, the three fields are year, month and day.  The three subfields accept
+        only decimal digits: the year field accepts four digits while the month and day fields
+        both accept two digits.
+      </p>
+
+      <h4 id="section6-2-3">7.2.3&nbsp; Date-selection dialog</h4>
+      <p class="wrap">
+        To the right of each compound date field is a button with an icon that is intended to
+        represent a page from a calendar.  This button brings up a dialog box in which you can
+        select a date.  If there is a valid date in the adjacent compound date field, that date
+        is selected when the dialog is displayed.
+      </p>
+      <p class="wrap">
+        The arrow buttons at the top of the dialog are for moving through the months of the
+        calendar: the single-arrow buttons move to the previous or next month; the double-arrow
+        buttons move to the previous or next year.
+      </p>
+      <p class="wrap">
+        Between the two sets of arrow buttons is a label indicating the current month and year.
+        (The month is denoted by the first three or more characters of its name.)  If you click
+        the left mouse button on the label or press Ctrl+Space, a further dialog box is
+        displayed in which you can edit the month and year.
+      </p>
+      <p class="wrap">
+        The main panel of the date-selection dialog has the customary form of a month from a
+        calendar: a table whose columns are the seven days of the week.  The headers of the
+        column are the first two or more characters of the names of the days of the week.  If
+        you press the left mouse button over a column header, the full name of the day is
+        displayed in a pop-up box.
+      </p>
+      <p class="wrap">
+        You can use the left mouse button to select a day from the current month; the selection
+        cursor will follow the mouse cursor as you drag the mouse.  Double-clicking on a day
+        will select the date and accept the dialog (ie, it will close the dialog as though the
+        <span class="command">OK</span> command were issued).  If the dialog is accepted, the
+        adjacent compound date field will be updated with the selected date.
+      </p>
+      <p class="wrap">
+        The following keys can be used to navigate the date-selection dialog:
+      </p>
+      <table class="basic">
+        <tr>
+          <td class="definitionTerm">Left</td>
+          <td>Select the previous day in the current row</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">Right</td>
+          <td>Select the next day in the current row</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">Home</td>
+          <td>Select the first day in the current row</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">End</td>
+          <td>Select the last day in the current row</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">Up</td>
+          <td>Select the previous day in the current column</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">Down</td>
+          <td>Select the next day in the current column</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">Ctrl+Home</td>
+          <td>Select the first day in the current column</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">Ctrl+End</td>
+          <td>Select the last day in the current column</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">PageUp</td>
+          <td>Move to the previous month</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">PageDown</td>
+          <td>Move to the next month</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">Ctrl+PageUp</td>
+          <td>Move to the previous year</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">Ctrl+PageDown</td>
+          <td>Move to the next year</td>
+        </tr>
+        <tr>
+          <td class="definitionTerm">Ctrl+Space</td>
+          <td>Edit the month and year</td>
+        </tr>
+      </table>
+
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- Commands -->
+
+    <div class="section">
+      <h2 id="section7">7&nbsp; Commands</h2>
+      <p class="tocLink">
+        [ <a href="#toc">Table of contents</a> ]
+      </p>
+
+      <p class="wrap">
+        DateCalculator&apos;s main commands are issued from the buttons at the bottom of its
+        main window.  The tabs of the main window have their own commands, which are described
+        in the sections on the <a class="component" href="#section6-1-1">Increment</a> tab, <a
+        class="component" href="#section6-1-2">Difference</a> tab and <a class="component"
+        href="#section6-1-3">Interval</a> tab.
+      </p>
+
+      <h3 id="section7-1">7.1&nbsp; <span class="command">Preferences</span></h3>
+
+      <p class="wrap">
+        The <span class="command">Preferences</span> command brings up a tabbed dialog box in
+        which the configuration properties of DateCalculator can be edited.  The properties on
+        the various tabbed pages are described below.
+      </p>
+
+      <div class="preferences">
+        <div>
+          <div class="sectionTitle" id="section7-1-a">General</div>
+        </div>
+
+        <div>
+          <div id="cp-general-showUnixPathnames">
+            <dl>
+              <dt>Display UNIX-style pathnames</dt>
+              <dd>
+                <div class="wrap">
+                  If you select <code>Yes</code>, pathnames are displayed in a reduced
+                  &quot;UNIX style&quot; in error messages relating to the configuration file.
+                  A pathname is converted from its platform-specific form in two steps:
+                </div>
+                <ol class="noTopMargin">
+                  <li class="wrap">
+                    If the pathname starts with the user&apos;s home directory, the latter is
+                    replaced by <code>~</code>.
+                  </li>
+                  <li class="wrap">
+                    The file-separator character (<code>\</code> on Windows systems) is replaced
+                    by <code>/</code>.
+                  </li>
+                </ol>
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default value is <code>No</code>.
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div>
+          <div id="cp-general-selectTextOnFocusGained">
+            <dl>
+              <dt>Select text when focus is gained</dt>
+              <dd class="wrap">
+                If you select <code>Yes</code>, all the text in a text field will be
+                automatically selected when the field gains keyboard focus, regardless of how
+                the focus is transferred.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default value is <code>Yes</code>.
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div>
+          <div id="cp-general-mainWindowLocation">
+            <dl>
+              <dt>Save location of main window</dt>
+              <dd class="wrap">
+                If you select <code>Yes</code>, the location of the main window on the screen
+                will be saved to the configuration file when you exit the application.  The next
+                time that DateCalculator is run, its main window will be positioned at the
+                previously saved location.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default value is <code>No</code>.
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="preferences">
+        <div>
+          <div class="sectionTitle" id="section7-1-b">Appearance</div>
+        </div>
+
+        <div>
+          <div id="cp-appearance-lookAndFeel">
+            <dl>
+              <dt>Look-and-feel</dt>
+              <dd class="wrap">
+                The look-and-feel (LAF) can be selected from a list of the LAFs that are
+                available on the current system.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default value is the cross-platform LAF, currently called Metal.
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div>
+          <div id="cp-appearance-textAntialiasing">
+            <dl>
+              <dt>Text antialiasing</dt>
+              <dd class="wrap">
+                This determines the kind of antialiasing that is performed when text is drawn in
+                custom or partially customised user-interface components (eg, in drop-down
+                lists).  Note that antialiasing is only a hint in Java; the implementation is
+                not required to perform the chosen antialiasing.
+              </dd>
+              <dd class="spaceAbove wrap">
+                This property has no effect on the antialiasing of text in standard UI
+                components, such as labels and menus, which is determined by the Java
+                implementation and the desktop setting for antialiasing text (often referred to
+                as &quot;font smoothing&quot;).  You can override the desktop setting with the
+                unsupported system property <code><a class="external"
+                href="https://docs.oracle.com/javase/7/docs/technotes/guides/2d/flags.html#aaFonts">awt.useSystemAAFontSettings</a></code>.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The text antialiasing property can have the following values:
+              </dd>
+              <dd>
+                <dl class="inner1">
+                  <dt>Default</dt>
+                  <dd class="wrap">
+                    The desktop setting for text antialiasing (font smoothing) is used, if the
+                    Java implementation recognises one; otherwise, no antialiasing is performed.
+                  </dd>
+
+                  <dt>None</dt>
+                  <dd class="wrap">
+                    No antialiasing is performed.
+                  </dd>
+
+                  <dt>Standard</dt>
+                  <dd class="wrap">
+                    This selects pixel-oriented antialiasing rather than subpixel antialiasing.
+                    It is suitable for non-LCD displays.
+                  </dd>
+
+                  <dt>Subpixel, horizontal RGB</dt>
+                  <dt>Subpixel, horizontal BGR</dt>
+                  <dt>Subpixel, vertical RGB</dt>
+                  <dt>Subpixel, vertical BGR</dt>
+                  <dd class="wrap">
+                    These four options are intended to optimise the rendering of text for LCD
+                    displays using subpixel antialiasing with subpixels in the chosen
+                    arrangement.  Selecting an option that does not correspond to the actual
+                    arrangement of subpixels in your LCD display may result in blurred text.
+                    The most common arrangement of subpixels is horizontal RGB.
+                  </dd>
+                </dl>
+              </dd>
+              <dd class="wrap">
+                The default value is <code>Default</code>.
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div>
+          <div id="cp-appearance-showAdjacentMonths">
+            <dl>
+              <dt>Show days of adjacent months</dt>
+              <dd class="wrap">
+                If you select <code>No</code>, the pages of the calendar in the <a
+                href="#section6-2-3">date-selection dialog</a> show only the days of the current
+                month, with empty spaces in place of the days of the preceding and following
+                months.  If you select <code>Yes</code>, the days of the adjacent months are
+                shown greyed.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default value is <code>Yes</code>.
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="preferences">
+        <div>
+          <div class="sectionTitle" id="section7-1-c">Date</div>
+        </div>
+
+        <div>
+          <div id="cp-date-format">
+            <dl>
+              <dt>Date formats</dt>
+              <dd class="wrap">
+                These are the formats that can be applied to the dates that are output by
+                DateCalculator&apos;s <i>increment</i> and <i>interval</i> functions.  The
+                formats are displayed in a list box.  A maximum of 64 date formats can be
+                defined.
+              </dd>
+              <dd class="spaceAbove wrap">
+                A <a href="#section5-3">date format</a> consists of a name and a pattern; in the
+                list box, the name is in the left column and the pattern is in the right column.
+                The list can be edited with the <span class="command">Add</span>, <span
+                class="command">Edit</span> and <span class="command">Delete</span> commands,
+                which are issued with the buttons adjacent to the list box.  You can change the
+                order of items in the list by dragging an item to a new position with the mouse,
+                or by pressing Ctrl+Shift+Up or Ctrl+Shift+Down when the list has keyboard
+                focus.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The <span class="command">Add</span> and <span class="command">Edit</span>
+                commands bring up a dialog box in which the name and pattern of a date format
+                can be edited.  Neither the name nor the pattern of a date format may contain
+                the string <code>##</code> because it is used in the configuration property as
+                the separator between the name and pattern.
+              </dd>
+              <dd class="spaceAbove wrap">
+                If no date formats are defined, a default format named <code>Default</code>,
+                with the pattern <code>%04y-%02m-%02d</code>, is available from <span
+                class="component">Date format</span> drop-down lists.
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div>
+          <div id="cp-date-namesSource">
+            <dl>
+              <dt>Source of names of months &amp; days of the week</dt>
+              <dd class="wrap">
+                This determines whether the names of months and days of the week in the dates
+                output by DateCalculator are obtained from a specified locale (a language, or a
+                language and country) or defined by the user.  If <code>Locale</code> is
+                selected, the names are obtained from the locale specified by the <a
+                class="configProperty" href="#cp-date-namesLocale">date.namesLocale</a>
+                configuration property; if <code>User-defined</code> is selected, the names are
+                obtained from the user-defined lists of names of <a
+                href="#cp-date-monthName">months</a> and <a href="#cp-date-dayName">days of the
+                week</a>.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default value is <code>Locale</code>.
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div>
+          <div id="cp-date-namesLocale">
+            <dl>
+              <dt>Locale for names of months &amp; days of the week</dt>
+              <dd class="wrap">
+                This is the locale that is used as the source for names of months and days of
+                the week if the <a class="configProperty"
+                href="#cp-date-namesSource">date.namesSource</a> configuration property is set
+                to <code>Locale</code>.  The drop-down list contains the names of all the
+                available locales.  The names are in an abbreviated form: all locales have a
+                two-letter, lower-case <a class="external"
+                href="https://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1</a> language code
+                followed in some cases by a hyphen and a two-letter, upper-case <a
+                class="external" href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO
+                3166-1</a> country code.  (In a few cases, the country code is followed by
+                another hyphen and a <i>variant</i> code.)  At the top of the list is the
+                special value, <code>&lt;default locale&gt;</code>, which identifies the <a
+                href="#section4-1">default locale</a>.
+              </dd>
+              <dd class="spaceAbove wrap">
+                When the drop-down list is displayed, a more descriptive name for each locale is
+                displayed as a tooltip when the mouse cursor hovers over the item in the list.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default value is <code>&lt;default locale&gt;</code>.
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div>
+          <div id="cp-date-monthName">
+            <dl>
+              <dt>User-defined names of months</dt>
+              <dd class="wrap">
+                If you issue the <span class="command">Edit months</span> command, a dialog box
+                will be displayed in which you can edit the names of months.  Within the dialog,
+                the <span class="command">Set from locale</span> command sets the names of all
+                the months to their names for the <a href="#section4-1">default locale</a>.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default value of the name of each month is the empty string.
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div>
+          <div id="cp-date-dayName">
+            <dl>
+              <dt>User-defined names of days of the week</dt>
+              <dd class="wrap">
+                If you issue the <span class="command">Edit days</span> command, a dialog box
+                will be displayed in which you can edit the names of days of the week.  Within
+                the dialog, the <span class="command">Set from locale</span> command sets the
+                names of all the days to their names for the <a href="#section4-1">default
+                locale</a>.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default value of the name of each day of the week is the empty string.
+              </dd>
+            </dl>
+          </div>
+        </div>
+        <div>
+          <div id="cp-date-firstDayOfWeek">
+            <dl>
+              <dt>First day of the week</dt>
+              <dd class="wrap">
+                This value is used to determine the first day of the week for the columns in the
+                <a href="#section6-2-3">date-selection dialog</a>.  If you select
+                <code>&lt;default&gt;</code>, the first day of the week will be that for the
+                default locale, which, for example, is Monday in the UK and Sunday in the USA.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default value is <code>&lt;default&gt;</code>, which uses the value for the
+                <a href="#section4-1">default locale</a>.
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="preferences">
+        <div>
+          <div class="sectionTitle" id="section7-1-d">Fonts</div>
+        </div>
+
+        <div>
+          <div id="cp-font">
+            <dl>
+              <dd class="wrap">
+                These are the fonts that are used in DateCalculator&apos;s display.  Remember
+                that font names may be platform-dependent, so that a configuration that
+                specifies font names may not work across platforms.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The <i>main</i> font is used for various components including labels (static
+                text), menus, buttons and list boxes.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The <i>text field</i> font is used for text fields, spinners and some other text
+                components.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The <i>combo box</i> font is used for drop-down lists and related components.
+              </dd>
+              <dd class="spaceAbove wrap">
+                The default values of all the font properties are those of the default fonts for
+                the platform and look-and-feel.  A default font size is specified by leaving the
+                <span class="component">Size</span> field empty (the minimum position on the
+                spinner).  A default font is used if no font name is specified in
+                DateCalculator&apos;s configuration or if the named font is not available.
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <p class="wrap">
+        Some of the configuration properties will take effect when the <span
+        class="component">Preferences</span> dialog is accepted (by closing it with <i>OK</i>);
+        other properties (eg, the look-and-feel and fonts) will not take effect until the next
+        time that DateCalculator is run.
+      </p>
+      <p class="wrap">
+        The <a href="#section3-2">configuration file</a> is normally saved automatically when
+        DateCalculator exits, if the configuration has changed.  The <span class="command">Save
+        configuration</span> command in the <span class="component">Preferences</span> dialog
+        can be used to save a configuration file explicitly.
+      </p>
+
+      <h3 id="section7-2">7.2&nbsp; <span class="command">Exit</span></h3>
+
+      <p class="wrap">
+        This command terminates the application.
+      </p>
+
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- Special constructs in pathnames -->
+
+    <div class="section">
+      <h2 id="sectionA">Appendix A:&nbsp; Special constructs in pathnames</h2>
+      <p class="tocLink">
+        [ <a href="#toc">Table of contents</a> ]
+      </p>
+
+      <p class="wrap">
+        The <span class="configProperty">app.configDir</span> configuration property can contain
+        special constructs for system properties, environment variables and the user&apos;s home
+        directory.  The special constructs are expanded when the pathname is used.
+      </p>
+
+      <dl class="basic">
+        <dt>System properties and environment variables</dt>
+        <dd class="wrap">
+          Java system properties (eg, the user&apos;s home directory, <code>user.home</code>)
+          and environment variables (eg, <code>PATH</code>) are referenced by enclosing them
+          between <code>${</code> and <code>}</code>; that is, they must have the form
+          <code>${&lt;<i>name</i>&gt;}</code>.  A Java system property takes precedence over an
+          environment variable with the same name.
+        </dd>
+        <dd class="wrap">
+          &bull; Example: <code>${user.home}/projects</code>
+        </dd>
+        <dd class="wrap">
+          &bull; Example: <code>${HOME}/projects</code>
+        </dd>
+        <dd class="wrap">
+          A Java system property can be specified by prefixing <code>sys.</code> to it.
+        </dd>
+        <dd class="wrap">
+          &bull; Example: <code>${sys.user.home}/projects</code>
+        </dd>
+        <dd class="wrap">
+          An environment variable can be specified by prefixing <code>env.</code> to it.
+        </dd>
+        <dd class="wrap">
+          &bull; Example: <code>${env.HOME}/projects</code>
+        </dd>
+
+        <dt>User&apos;s home directory</dt>
+        <dd class="wrap">
+          A leading <code>~</code> in a pathname is expanded into the user&apos;s home directory
+          using the <code>user.home</code> system property, which is usually equivalent to the
+          environment variable <code>$HOME</code> on Linux/UNIX systems or
+          <code>%USERPROFILE%</code> on Windows systems.
+        </dd>
+        <dd class="wrap">
+          &bull; Example: <code>~/projects</code>
+        </dd>
+      </dl>
+
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- Configuration properties -->
+
+    <div class="section">
+      <h2 id="sectionB">Appendix B:&nbsp; Configuration properties</h2>
+      <p class="tocLink">
+        [ <a href="#toc">Table of contents</a> ]
+      </p>
+
+      <p class="wrap">
+        The table below lists the configuration properties of DateCalculator.  Apart from the
+        <span class="configProperty">app.configDir</span> property, which, for obvious reasons,
+        cannot be used within a configuration file, all properties can be used in the two
+        configuration locations: command-line properties and configuration file.
+      </p>
+      <p class="wrap">
+        When used in a <code>-D</code> command-line property, <code>app.</code> must be prefixed
+        to the property key (eg, <span
+        class="configProperty">app.general.mainWindowLocation</span>).
+      </p>
+      <p class="wrap">
+        Any commas (<code>,</code>) or backslash characters (<code>\</code>) in the name of a
+        font must be escaped by prefixing a <code>\</code> character to them.
+      </p>
+      <p class="noBottomMargin wrap">
+        In the table below, the initial character of an italicised component of a property value
+        denotes its data type according to the following convention:
+      </p>
+
+      <table class="dataType">
+        <tr>
+          <td><i>i</i></td>
+          <td>integer</td>
+        </tr>
+        <tr>
+          <td><i>p</i></td>
+          <td>
+            platform-specific pathname, which may contain <a href="#sectionA">special
+            constructs</a>
+          </td>
+        </tr>
+        <tr>
+          <td><i>s</i></td>
+          <td>string</td>
+        </tr>
+      </table>
+
+      <table class="configProperties">
+        <tr>
+          <th>Property key</th>
+          <th>Property value</th>
+        </tr>
+
+        <tr>
+          <td class="propertyKey">configDir</td>
+          <td class="propertyValue"><i>pPathname</i></td>
+        </tr>
+
+        <tr>
+          <td class="propertyKey">appearance.showAdjacentMonths</td>
+          <td class="propertyValue">false | true</td>
+        </tr>
+        <tr>
+          <td class="propertyKey">appearance.lookAndFeel</td>
+          <td class="propertyValue"><i>sName</i></td>
+        </tr>
+        <tr>
+          <td class="propertyKey">appearance.textAntialiasing</td>
+          <td class="propertyValue">
+            default | none | normal | subpixelHRgb | subpixelHBgr | subpixelVRgb | subpixelVBgr
+          </td>
+        </tr>
+
+        <tr>
+          <td class="propertyKey">date.dayName.<i>&lt;index&gt;</i></td>
+          <td class="propertyValue"><i>sName</i></td>
+        </tr>
+        <tr>
+          <td class="propertyKey">date.firstDayOfWeek</td>
+          <td class="propertyValue"><i>iIndex</i></td>
+        </tr>
+        <tr>
+          <td class="propertyKey">date.format.<i>&lt;index&gt;</i></td>
+          <td class="propertyValue"><i>sName</i>##<i>sPattern</i></td>
+        </tr>
+        <tr>
+          <td class="propertyKey">date.monthName.<i>&lt;index&gt;</i></td>
+          <td class="propertyValue"><i>sName</i></td>
+        </tr>
+        <tr>
+          <td class="propertyKey">date.namesLocale</td>
+          <td class="propertyValue"><i>sLocale</i></td>
+        </tr>
+        <tr>
+          <td class="propertyKey">date.namesSource</td>
+          <td class="propertyValue">locale | userDefined</td>
+        </tr>
+
+        <tr>
+          <td class="propertyKey">font.comboBox</td>
+          <td class="propertyValue">
+            <i>sName</i>, plain | bold | italic | boldItalic, <i>iSize</i>
+          </td>
+        </tr>
+        <tr>
+          <td class="propertyKey">font.main</td>
+          <td class="propertyValue">
+            <i>sName</i>, plain | bold | italic | boldItalic, <i>iSize</i>
+          </td>
+        </tr>
+        <tr>
+          <td class="propertyKey">font.textField</td>
+          <td class="propertyValue">
+            <i>sName</i>, plain | bold | italic | boldItalic, <i>iSize</i>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="propertyKey">general.mainWindowLocation</td>
+          <td class="propertyValue">
+            <i>iX</i>, <i>iY</i>
+          </td>
+        </tr>
+        <tr>
+          <td class="propertyKey">general.selectTextOnFocusGained</td>
+          <td class="propertyValue">false | true</td>
+        </tr>
+        <tr>
+          <td class="propertyKey">general.showUnixPathnames</td>
+          <td class="propertyValue">false | true</td>
+        </tr>
+      </table>
+
+    </div>
+
+    <!--=====================================================================================-->
+
+    <!-- Footer -->
+
+    <div id="lastModified">
+      <div>
+        <div>
+          Last modified: 2023-08-12
+        </div>
+        <div class="image">
+          <a class="hideHover" href="http://validator.w3.org/check?uri=referer">
+            <img alt="XHTML 1.1" src="images/valid-xhtml11-blue.png"/>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
