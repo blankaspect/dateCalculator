@@ -168,7 +168,7 @@ class Utils
 	{
 		String pathname = PropertiesPathname.getPathname();
 		if (pathname != null)
-			pathname += App.NAME_KEY;
+			pathname += DateCalculatorApp.NAME_KEY;
 		return pathname;
 	}
 

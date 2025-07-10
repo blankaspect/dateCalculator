@@ -278,10 +278,10 @@ class IntervalPanel
 	////////////////////////////////////////////////////////////////////
 
 		private TextAreaDialog(Window owner,
-							   String titleStr,
+							   String title,
 							   String text)
 		{
-			super(owner, titleStr, KEY, NUM_COLUMNS, NUM_ROWS, text);
+			super(owner, title, KEY, NUM_COLUMNS, NUM_ROWS, text);
 		}
 
 		//--------------------------------------------------------------
@@ -291,10 +291,10 @@ class IntervalPanel
 	////////////////////////////////////////////////////////////////////
 
 		private static TextAreaDialog showDialog(Component parent,
-												 String    titleStr,
+												 String    title,
 												 String    text)
 		{
-			return new TextAreaDialog(GuiUtils.getWindow(parent), titleStr, text);
+			return new TextAreaDialog(GuiUtils.getWindow(parent), title, text);
 		}
 
 		//--------------------------------------------------------------
@@ -645,7 +645,7 @@ class IntervalPanel
 		}
 		catch (AppException e)
 		{
-			App.INSTANCE.showErrorMessage(App.SHORT_NAME, e);
+			DateCalculatorApp.INSTANCE.showErrorMessage(DateCalculatorApp.SHORT_NAME, e);
 		}
 	}
 

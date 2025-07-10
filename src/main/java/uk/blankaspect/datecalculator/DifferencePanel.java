@@ -36,8 +36,6 @@ import javax.swing.JPanel;
 
 import uk.blankaspect.common.exception.AppException;
 
-import uk.blankaspect.common.time.Time;
-
 import uk.blankaspect.ui.swing.button.FButton;
 
 import uk.blankaspect.ui.swing.label.FLabel;
@@ -65,19 +63,20 @@ class DifferencePanel
 
 	private static final	Insets	COPY_BUTTON_MARGINS	= new Insets(2, 4, 2, 4);
 
-	private static final	String	START_DATE_STR	= "Start date";
-	private static final	String	END_DATE_STR	= "End date";
-	private static final	String	RESULT_STR		= "Result";
-	private static final	String	COPY_STR		= "Copy";
-	private static final	String	SUBTRACT_STR	= "Subtract";
+	private static final	String	TIME_ZONE_ID_UTC	= "UTC";
 
+	private static final	String	START_DATE_STR					= "Start date";
+	private static final	String	END_DATE_STR					= "End date";
+	private static final	String	RESULT_STR						= "Result";
+	private static final	String	COPY_STR						= "Copy";
+	private static final	String	SUBTRACT_STR					= "Subtract";
 	private static final	String	SELECT_START_DATE_TOOLTIP_STR	= "Select start date";
 	private static final	String	TODAY_START_TOOLTIP_STR			= "Set start date to current date";
 	private static final	String	SELECT_END_DATE_TOOLTIP_STR		= "Select end date";
 	private static final	String	TODAY_END_TOOLTIP_STR			= "Set end date to current date";
 	private static final	String	COPY_TOOLTIP_STR				= "Copy result to clipboard";
-	private static final	String	SUBTRACT_TOOLTIP_STR			= "Calculate number of days from " +
-																		"start date to end date";
+	private static final	String	SUBTRACT_TOOLTIP_STR			=
+			"Calculate number of days from start date to end date";
 
 	private static final	String	KEY	= DifferencePanel.class.getCanonicalName();
 
@@ -310,7 +309,7 @@ class DifferencePanel
 		}
 		catch (AppException e)
 		{
-			App.INSTANCE.showErrorMessage(App.SHORT_NAME, e);
+			DateCalculatorApp.INSTANCE.showErrorMessage(DateCalculatorApp.SHORT_NAME, e);
 		}
 	}
 
@@ -386,12 +385,12 @@ class DifferencePanel
 
 		// Get date 1
 		Calendar date1 = startDatePanel.getDate();
-		date1.setTimeZone(TimeZone.getTimeZone(Time.UTC_TIME_ZONE_STR));
+		date1.setTimeZone(TimeZone.getTimeZone(TIME_ZONE_ID_UTC));
 		long time1 = date1.getTimeInMillis();
 
 		// Get date 2
 		Calendar date2 = endDatePanel.getDate();
-		date2.setTimeZone(TimeZone.getTimeZone(Time.UTC_TIME_ZONE_STR));
+		date2.setTimeZone(TimeZone.getTimeZone(TIME_ZONE_ID_UTC));
 		long time2 = date2.getTimeInMillis();
 
 		// Calculate difference and display it in result field

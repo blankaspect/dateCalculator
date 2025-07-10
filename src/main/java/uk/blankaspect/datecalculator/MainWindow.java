@@ -2,7 +2,7 @@
 
 MainWindow.java
 
-Main window class.
+Class: main window.
 
 \*====================================================================*/
 
@@ -47,7 +47,7 @@ import uk.blankaspect.ui.swing.tabbedpane.FTabbedPane;
 //----------------------------------------------------------------------
 
 
-// MAIN WINDOW CLASS
+// CLASS: MAIN WINDOW
 
 
 class MainWindow
@@ -76,10 +76,11 @@ class MainWindow
 //  Constructors
 ////////////////////////////////////////////////////////////////////////
 
-	public MainWindow(String titleStr)
+	public MainWindow(
+		String	title)
 	{
 		// Call superclass constructor
-		super(titleStr);
+		super(title);
 
 		// Set icons
 		setIconImages(Images.APP_ICON_IMAGES);
@@ -192,7 +193,8 @@ class MainWindow
 		addWindowListener(new WindowAdapter()
 		{
 			@Override
-			public void windowClosing(WindowEvent event)
+			public void windowClosing(
+				WindowEvent	event)
 			{
 				onExit();
 			}
@@ -224,7 +226,8 @@ class MainWindow
 ////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void actionPerformed(ActionEvent event)
+	public void actionPerformed(
+		ActionEvent	event)
 	{
 		String command = event.getActionCommand();
 

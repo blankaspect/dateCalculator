@@ -6,52 +6,81 @@ Styles for DateCalculator manual
 
 @import url("blankaspect-manual.css");
 
-span.variable
-{
-  color: #006080;
+span.variable {
   font-weight: bold;
   font-style: italic;
 }
 
-table.basic td.definitionTerm
-{
-  color: #004040;
+table.basic td.definitionTerm {
   font-weight: bold;
 }
 
-table td.subheader
-{
-  background-color: #ECF0F8;
-  color: #404040;
+table td.subheader {
   font-size: 83%;
 }
 
-table td.key
-{
-  color: #C04000;
+table td.key {
   font-weight: bold;
 }
 
-table#dateFormatExamples td.pattern
-{
-  background-color: #F8F6E0;
-  color: #004040;
+table#dateFormatExamples td.pattern {
   white-space: nowrap;
 }
-table#dateFormatExamples td.output
-{
+table#dateFormatExamples td.output {
   white-space: nowrap;
-}
-table#dateFormatExamples code
-{
-  color: black;
-  background: transparent;
 }
 
-ul.paddedItems li
-{
+ul.paddedItems li {
   padding-top: 0.2em;
   padding-bottom: 0.2em;
+}
+
+@media (prefers-color-scheme: light) {
+  span.variable {
+    color: #006080;
+  }
+
+  table.basic td.definitionTerm {
+    color: #004040;
+  }
+
+  table td.subheader {
+    background-color: #ECF0F8;
+    color: #404040;
+  }
+
+  table td.key {
+    color: #C04000;
+  }
+
+  table#dateFormatExamples td.pattern {
+    background-color: #F8F6E0;
+    color: #004040;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  span.variable {
+    color: #E06000;
+  }
+
+  table.basic td.definitionTerm {
+    color: #80CCC8;
+  }
+
+  table td.subheader {
+    background-color: #383838;
+    color: #F0F0D0;
+  }
+
+  table td.key {
+    color: #80CCC8;
+  }
+
+  table#dateFormatExamples td.pattern {
+    background-color: inherit;
+    color: #80CCC8;
+  }
 }
 
 /*--------------------------------------------------------------------*/

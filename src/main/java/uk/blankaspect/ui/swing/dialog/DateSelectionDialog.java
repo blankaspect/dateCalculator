@@ -20,7 +20,6 @@ package uk.blankaspect.ui.swing.dialog;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -162,7 +161,7 @@ public class DateSelectionDialog
 							   String  key)
 	{
 		// Call superclass constructor
-		super(owner, Dialog.ModalityType.APPLICATION_MODAL);
+		super(owner, ModalityType.APPLICATION_MODAL);
 
 		// Initialise instance variables
 		this.key = key;
@@ -241,7 +240,7 @@ public class DateSelectionDialog
 		// Set content pane
 		setContentPane(mainPanel);
 
-		// Omit frame from dialog box
+		// Omit frame from dialog
 		setUndecorated(true);
 
 		// Dispose of window explicitly
@@ -263,7 +262,7 @@ public class DateSelectionDialog
 		// Resize dialog to its preferred size
 		pack();
 
-		// Set location of dialog box
+		// Set location of dialog
 		if (location == null)
 			location = locations.get(key);
 		if (location == null)

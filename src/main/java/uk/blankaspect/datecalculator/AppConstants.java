@@ -45,8 +45,8 @@ interface AppConstants
 	String	CLEAR_STR			= "Clear";
 	String	ALREADY_EXISTS_STR	= "\nThe file already exists.\nDo you want to replace it?";
 
-	// Filename suffixes
-	String	XML_FILE_SUFFIX	= ".xml";
+	// Filename extensions
+	String	XML_FILENAME_EXTENSION	= ".xml";
 
 	// File-filter descriptions
 	String	XML_FILES_STR	= "XML files";

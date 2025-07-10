@@ -392,7 +392,7 @@ class IncrementPanel
 		}
 		catch (AppException e)
 		{
-			App.INSTANCE.showErrorMessage(App.SHORT_NAME, e);
+			DateCalculatorApp.INSTANCE.showErrorMessage(DateCalculatorApp.SHORT_NAME, e);
 		}
 	}
 

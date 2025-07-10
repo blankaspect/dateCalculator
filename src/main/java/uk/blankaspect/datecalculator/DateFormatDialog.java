@@ -20,7 +20,6 @@ package uk.blankaspect.datecalculator;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -37,7 +36,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -85,8 +83,8 @@ class DateFormatDialog
 //  Constants
 ////////////////////////////////////////////////////////////////////////
 
-	private static final	int	NAME_FIELD_NUM_COLUMNS		= 16;
-	private static final	int	PATTERN_FIELD_NUM_COLUMNS	= 32;
+	private static final	int		NAME_FIELD_NUM_COLUMNS		= 16;
+	private static final	int		PATTERN_FIELD_NUM_COLUMNS	= 32;
 
 	private static final	String	NAME_STR	= "Name";
 	private static final	String	PATTERN_STR	= "Pattern";
@@ -128,355 +126,58 @@ class DateFormatDialog
 		"{h0}{s2}%%{s}{h1}literal '%' character"
 	};
 
-	private static final	List<TaggedText.FieldDef>		FIELD_DEFS		= Arrays.asList
+	private static final	List<TaggedText.FieldDef>		FIELD_DEFS		= List.of
 	(
 		new TaggedText.FieldDef(0),
 		new TaggedText.FieldDef(1)
 	);
-	private static final	List<TaggedText.VPaddingDef>	V_PADDING_DEFS	= Arrays.asList
+	private static final	List<TaggedText.VPaddingDef>	V_PADDING_DEFS	= List.of
 	(
 		new TaggedText.VPaddingDef(0, 0.2f, new Color(160, 192, 160)),
 		new TaggedText.VPaddingDef(1, 0.6f)
 	);
-	private static final	List<TaggedText.StyleDef>		STYLE_DEFS		= Arrays.asList
+	private static final	List<TaggedText.StyleDef>		STYLE_DEFS		= List.of
 	(
 		new TaggedText.StyleDef(0, FontStyle.BOLD, new Color(0, 64, 64)),
 		new TaggedText.StyleDef(1, new Color(96, 96, 96)),
 		new TaggedText.StyleDef(2, FontStyle.BOLD, new Color(192, 64, 0)),
 		new TaggedText.StyleDef(3, FontStyle.BOLD_ITALIC, new Color(0, 96, 128))
 	);
-	private static final	List<TaggedText.HPaddingDef>	H_PADDING_DEFS	= Arrays.asList
+	private static final	List<TaggedText.HPaddingDef>	H_PADDING_DEFS	= List.of
 	(
 		new TaggedText.HPaddingDef(0, 1.0f),
 		new TaggedText.HPaddingDef(1, 1.2f)
 	);
 
 ////////////////////////////////////////////////////////////////////////
-//  Enumerated types
+//  Class variables
 ////////////////////////////////////////////////////////////////////////
 
-
-	// ERROR IDENTIFIERS
-
-
-	private enum ErrorId
-		implements AppException.IId
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		NO_NAME
-		("No name was specified."),
-
-		DUPLICATE_NAME
-		("Name: %1\nA date format with this name is already defined."),
-
-		NO_PATTERN
-		("No pattern was specified."),
-
-		SEPARATOR_NOT_ALLOWED
-		("The name/pattern separator, \"" + DateFormat.SEPARATOR + "\", is not allowed in a name or " +
-			"pattern.");
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private ErrorId(String message)
-		{
-			this.message = message;
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods : AppException.IId interface
-	////////////////////////////////////////////////////////////////////
-
-		public String getMessage()
-		{
-			return message;
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance variables
-	////////////////////////////////////////////////////////////////////
-
-		private	String	message;
-
-	}
-
-	//==================================================================
+	private static	Point	location;
+	private static	Point	helpDialogLocation;
 
 ////////////////////////////////////////////////////////////////////////
-//  Member classes : inner classes
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
-
-	// HELP DIALOG CLASS
-
-
-	private class HelpDialog
-		extends JDialog
-		implements ActionListener
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		private static final	String	DATE_FORMAT_STR	= "Date format";
-
-	////////////////////////////////////////////////////////////////////
-	//  Member classes : inner classes
-	////////////////////////////////////////////////////////////////////
-
-
-		// TEXT PANEL CLASS
-
-
-		private class TextPanel
-			extends JComponent
-		{
-
-		////////////////////////////////////////////////////////////////
-		//  Constants
-		////////////////////////////////////////////////////////////////
-
-			private static final	int	VERTICAL_MARGIN		= 3;
-			private static final	int	HORIZONTAL_MARGIN	= 6;
-
-		////////////////////////////////////////////////////////////////
-		//  Constructors
-		////////////////////////////////////////////////////////////////
-
-			private TextPanel()
-			{
-				AppFont.MAIN.apply(this);
-				text = new TaggedText('{', '}', FIELD_DEFS, STYLE_DEFS, V_PADDING_DEFS, H_PADDING_DEFS,
-									  HELP_TEXT_STRS);
-				setOpaque(true);
-				setFocusable(false);
-			}
-
-			//----------------------------------------------------------
-
-		////////////////////////////////////////////////////////////////
-		//  Instance methods : overriding methods
-		////////////////////////////////////////////////////////////////
-
-			@Override
-			public Dimension getPreferredSize()
-			{
-				return new Dimension(2 * HORIZONTAL_MARGIN + text.getWidth(),
-									 2 * VERTICAL_MARGIN + text.getHeight());
-			}
-
-			//----------------------------------------------------------
-
-			@Override
-			protected void paintComponent(Graphics gr)
-			{
-				// Fill background
-				Rectangle rect = gr.getClipBounds();
-				gr.setColor(HELP_PANEL_BACKGROUND_COLOUR);
-				gr.fillRect(rect.x, rect.y, rect.width, rect.height);
-
-				// Draw border
-				gr.setColor(HELP_PANEL_BORDER_COLOUR);
-				gr.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-
-				// Draw text
-				text.draw(gr, VERTICAL_MARGIN, HORIZONTAL_MARGIN);
-			}
-
-			//----------------------------------------------------------
-
-		////////////////////////////////////////////////////////////////
-		//  Instance methods
-		////////////////////////////////////////////////////////////////
-
-			public void updateText()
-			{
-				text.update(getGraphics());
-			}
-
-			//----------------------------------------------------------
-
-		////////////////////////////////////////////////////////////////
-		//  Instance variables
-		////////////////////////////////////////////////////////////////
-
-			private	TaggedText	text;
-
-		}
-
-		//==============================================================
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private HelpDialog()
-		{
-			// Call superclass constructor
-			super(DateFormatDialog.this, DATE_FORMAT_STR);
-
-			// Set icons
-			setIconImages(DateFormatDialog.this.getIconImages());
-
-
-			//----  Text panel
-
-			TextPanel textPanel = new TextPanel();
-
-
-			//----  Button panel
-
-			JPanel buttonPanel = new JPanel(new GridLayout(1, 0, 0, 0));
-			buttonPanel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
-
-			// Button: close
-			JButton closeButton = new FButton(AppConstants.CLOSE_STR);
-			closeButton.setActionCommand(Command.CLOSE);
-			closeButton.addActionListener(this);
-			buttonPanel.add(closeButton);
-
-
-			//----  Main panel
-
-			GridBagLayout gridBag = new GridBagLayout();
-			GridBagConstraints gbc = new GridBagConstraints();
-
-			JPanel mainPanel = new JPanel(gridBag);
-
-			gbc.gridx = 0;
-			gbc.gridy = 0;
-			gbc.gridwidth = 1;
-			gbc.gridheight = 1;
-			gbc.weightx = 0.0;
-			gbc.weighty = 0.0;
-			gbc.anchor = GridBagConstraints.NORTH;
-			gbc.fill = GridBagConstraints.NONE;
-			gbc.insets = new Insets(0, 0, 0, 0);
-			gridBag.setConstraints(textPanel, gbc);
-			mainPanel.add(textPanel);
-
-			gbc.gridx = 0;
-			gbc.gridy = 1;
-			gbc.gridwidth = 1;
-			gbc.gridheight = 1;
-			gbc.weightx = 0.0;
-			gbc.weighty = 0.0;
-			gbc.anchor = GridBagConstraints.NORTH;
-			gbc.fill = GridBagConstraints.NONE;
-			gbc.insets = new Insets(3, 0, 3, 0);
-			gridBag.setConstraints(buttonPanel, gbc);
-			mainPanel.add(buttonPanel);
-
-			// Add commands to action map
-			KeyAction.create(mainPanel, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
-							 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), Command.CLOSE, this);
-
-
-			//----  Window
-
-			// Set content pane
-			setContentPane(mainPanel);
-
-			// Dispose of window explicitly
-			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-
-			// Handle window closing
-			addWindowListener(new WindowAdapter()
-			{
-				@Override
-				public void windowClosing(WindowEvent event)
-				{
-					onClose();
-				}
-			});
-
-			// Prevent dialog from being resized
-			setResizable(false);
-
-			// Resize dialog to its preferred size
-			pack();
-
-			// Resize dialog again after updating dimensions of tagged text
-			textPanel.updateText();
-			pack();
-
-			// Set location of dialog box
-			if (helpDialogLocation == null)
-				helpDialogLocation = GuiUtils.getComponentLocation(this, DateFormatDialog.this);
-			setLocation(helpDialogLocation);
-
-			// Set default button
-			getRootPane().setDefaultButton(closeButton);
-
-			// Set focus
-			closeButton.requestFocusInWindow();
-
-			// Show dialog
-			setVisible(true);
-
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods : ActionListener interface
-	////////////////////////////////////////////////////////////////////
-
-		public void actionPerformed(ActionEvent event)
-		{
-			if (event.getActionCommand().equals(Command.CLOSE))
-				onClose();
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods
-	////////////////////////////////////////////////////////////////////
-
-		private void close()
-		{
-			helpDialogLocation = getLocation();
-			setVisible(false);
-			dispose();
-		}
-
-		//--------------------------------------------------------------
-
-		private void onClose()
-		{
-			DateFormatDialog.this.closeHelpDialog();
-		}
-
-		//--------------------------------------------------------------
-
-	}
-
-	//==================================================================
+	private	List<String>	names;
+	private	boolean			accepted;
+	private	JButton			helpButton;
+	private	JTextField		nameField;
+	private	JTextField		patternField;
+	private	HelpDialog		helpDialog;
 
 ////////////////////////////////////////////////////////////////////////
 //  Constructors
 ////////////////////////////////////////////////////////////////////////
 
 	private DateFormatDialog(Window       owner,
-							 String       titleStr,
+							 String       title,
 							 DateFormat   dateFormat,
 							 List<String> names)
 	{
-
 		// Call superclass constructor
-		super(owner, titleStr, Dialog.ModalityType.APPLICATION_MODAL);
+		super(owner, title, ModalityType.APPLICATION_MODAL);
 
 		// Set icons
 		setIconImages(owner.getIconImages());
@@ -677,7 +378,7 @@ class DateFormatDialog
 		// Resize dialog to its preferred size
 		pack();
 
-		// Set location of dialog box
+		// Set location of dialog
 		if (location == null)
 			location = GuiUtils.getComponentLocation(this, owner);
 		setLocation(location);
@@ -687,7 +388,6 @@ class DateFormatDialog
 
 		// Show dialog
 		setVisible(true);
-
 	}
 
 	//------------------------------------------------------------------
@@ -697,12 +397,11 @@ class DateFormatDialog
 ////////////////////////////////////////////////////////////////////////
 
 	public static DateFormat showDialog(Component    parent,
-										String       titleStr,
+										String       title,
 										DateFormat   dateFormat,
 										List<String> names)
 	{
-		return new DateFormatDialog(GuiUtils.getWindow(parent), titleStr, dateFormat, names).
-																						getDateFormat();
+		return new DateFormatDialog(GuiUtils.getWindow(parent), title, dateFormat, names).getDateFormat();
 	}
 
 	//------------------------------------------------------------------
@@ -733,8 +432,7 @@ class DateFormatDialog
 
 	private DateFormat getDateFormat()
 	{
-		return (accepted ? new DateFormat(nameField.getText(), patternField.getText())
-						 : null);
+		return accepted ? new DateFormat(nameField.getText(), patternField.getText()) : null;
 	}
 
 	//------------------------------------------------------------------
@@ -746,7 +444,7 @@ class DateFormatDialog
 		try
 		{
 			String str = nameField.getText();
-			if (str.trim().isEmpty())
+			if (str.strip().isEmpty())
 				throw new AppException(ErrorId.NO_NAME);
 			if (names.contains(str))
 				throw new AppException(ErrorId.DUPLICATE_NAME, str);
@@ -763,7 +461,7 @@ class DateFormatDialog
 		try
 		{
 			String str = patternField.getText();
-			if (str.trim().isEmpty())
+			if (str.strip().isEmpty())
 				throw new AppException(ErrorId.NO_PATTERN);
 			if (str.contains(DateFormat.SEPARATOR))
 				throw new AppException(ErrorId.SEPARATOR_NOT_ALLOWED);
@@ -819,7 +517,7 @@ class DateFormatDialog
 		}
 		catch (AppException e)
 		{
-			JOptionPane.showMessageDialog(this, e, App.SHORT_NAME, JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, e, DateCalculatorApp.SHORT_NAME, JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -837,22 +535,316 @@ class DateFormatDialog
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Class variables
+//  Enumerated types
 ////////////////////////////////////////////////////////////////////////
 
-	private static	Point	location;
-	private static	Point	helpDialogLocation;
+
+	// ERROR IDENTIFIERS
+
+
+	private enum ErrorId
+		implements AppException.IId
+	{
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		NO_NAME
+		("No name was specified."),
+
+		DUPLICATE_NAME
+		("Name: %1\nA date format with this name is already defined."),
+
+		NO_PATTERN
+		("No pattern was specified."),
+
+		SEPARATOR_NOT_ALLOWED
+		("The name/pattern separator, \"" + DateFormat.SEPARATOR + "\", is not allowed in a name or pattern.");
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance variables
+	////////////////////////////////////////////////////////////////////
+
+		private	String	message;
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private ErrorId(String message)
+		{
+			this.message = message;
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods : AppException.IId interface
+	////////////////////////////////////////////////////////////////////
+
+		public String getMessage()
+		{
+			return message;
+		}
+
+		//--------------------------------------------------------------
+
+	}
+
+	//==================================================================
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance variables
+//  Member classes : inner classes
 ////////////////////////////////////////////////////////////////////////
 
-	private	List<String>	names;
-	private	boolean			accepted;
-	private	JButton			helpButton;
-	private	JTextField		nameField;
-	private	JTextField		patternField;
-	private	HelpDialog		helpDialog;
+
+	// HELP DIALOG CLASS
+
+
+	private class HelpDialog
+		extends JDialog
+		implements ActionListener
+	{
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		private static final	String	DATE_FORMAT_STR	= "Date format";
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private HelpDialog()
+		{
+			// Call superclass constructor
+			super(DateFormatDialog.this, DATE_FORMAT_STR);
+
+			// Set icons
+			setIconImages(DateFormatDialog.this.getIconImages());
+
+
+			//----  Text panel
+
+			TextPanel textPanel = new TextPanel();
+
+
+			//----  Button panel
+
+			JPanel buttonPanel = new JPanel(new GridLayout(1, 0, 0, 0));
+			buttonPanel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
+
+			// Button: close
+			JButton closeButton = new FButton(AppConstants.CLOSE_STR);
+			closeButton.setActionCommand(Command.CLOSE);
+			closeButton.addActionListener(this);
+			buttonPanel.add(closeButton);
+
+
+			//----  Main panel
+
+			GridBagLayout gridBag = new GridBagLayout();
+			GridBagConstraints gbc = new GridBagConstraints();
+
+			JPanel mainPanel = new JPanel(gridBag);
+
+			gbc.gridx = 0;
+			gbc.gridy = 0;
+			gbc.gridwidth = 1;
+			gbc.gridheight = 1;
+			gbc.weightx = 0.0;
+			gbc.weighty = 0.0;
+			gbc.anchor = GridBagConstraints.NORTH;
+			gbc.fill = GridBagConstraints.NONE;
+			gbc.insets = new Insets(0, 0, 0, 0);
+			gridBag.setConstraints(textPanel, gbc);
+			mainPanel.add(textPanel);
+
+			gbc.gridx = 0;
+			gbc.gridy = 1;
+			gbc.gridwidth = 1;
+			gbc.gridheight = 1;
+			gbc.weightx = 0.0;
+			gbc.weighty = 0.0;
+			gbc.anchor = GridBagConstraints.NORTH;
+			gbc.fill = GridBagConstraints.NONE;
+			gbc.insets = new Insets(3, 0, 3, 0);
+			gridBag.setConstraints(buttonPanel, gbc);
+			mainPanel.add(buttonPanel);
+
+			// Add commands to action map
+			KeyAction.create(mainPanel, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
+							 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), Command.CLOSE, this);
+
+
+			//----  Window
+
+			// Set content pane
+			setContentPane(mainPanel);
+
+			// Dispose of window explicitly
+			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+			// Handle window closing
+			addWindowListener(new WindowAdapter()
+			{
+				@Override
+				public void windowClosing(WindowEvent event)
+				{
+					onClose();
+				}
+			});
+
+			// Prevent dialog from being resized
+			setResizable(false);
+
+			// Resize dialog to its preferred size
+			pack();
+
+			// Resize dialog again after updating dimensions of tagged text
+			textPanel.updateText();
+			pack();
+
+			// Set location of dialog
+			if (helpDialogLocation == null)
+				helpDialogLocation = GuiUtils.getComponentLocation(this, DateFormatDialog.this);
+			setLocation(helpDialogLocation);
+
+			// Set default button
+			getRootPane().setDefaultButton(closeButton);
+
+			// Set focus
+			closeButton.requestFocusInWindow();
+
+			// Show dialog
+			setVisible(true);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods : ActionListener interface
+	////////////////////////////////////////////////////////////////////
+
+		public void actionPerformed(ActionEvent event)
+		{
+			if (event.getActionCommand().equals(Command.CLOSE))
+				onClose();
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods
+	////////////////////////////////////////////////////////////////////
+
+		private void close()
+		{
+			helpDialogLocation = getLocation();
+			setVisible(false);
+			dispose();
+		}
+
+		//--------------------------------------------------------------
+
+		private void onClose()
+		{
+			DateFormatDialog.this.closeHelpDialog();
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Member classes : inner classes
+	////////////////////////////////////////////////////////////////////
+
+
+		// TEXT PANEL CLASS
+
+
+		private class TextPanel
+			extends JComponent
+		{
+
+		////////////////////////////////////////////////////////////////
+		//  Constants
+		////////////////////////////////////////////////////////////////
+
+			private static final	int	VERTICAL_MARGIN		= 3;
+			private static final	int	HORIZONTAL_MARGIN	= 6;
+
+		////////////////////////////////////////////////////////////////
+		//  Instance variables
+		////////////////////////////////////////////////////////////////
+
+			private	TaggedText	text;
+
+		////////////////////////////////////////////////////////////////
+		//  Constructors
+		////////////////////////////////////////////////////////////////
+
+			private TextPanel()
+			{
+				AppFont.MAIN.apply(this);
+				text = new TaggedText('{', '}', FIELD_DEFS, STYLE_DEFS, V_PADDING_DEFS, H_PADDING_DEFS,
+									  HELP_TEXT_STRS);
+				setOpaque(true);
+				setFocusable(false);
+			}
+
+			//----------------------------------------------------------
+
+		////////////////////////////////////////////////////////////////
+		//  Instance methods : overriding methods
+		////////////////////////////////////////////////////////////////
+
+			@Override
+			public Dimension getPreferredSize()
+			{
+				return new Dimension(2 * HORIZONTAL_MARGIN + text.getWidth(),
+									 2 * VERTICAL_MARGIN + text.getHeight());
+			}
+
+			//----------------------------------------------------------
+
+			@Override
+			protected void paintComponent(Graphics gr)
+			{
+				// Fill background
+				Rectangle rect = gr.getClipBounds();
+				gr.setColor(HELP_PANEL_BACKGROUND_COLOUR);
+				gr.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+				// Draw border
+				gr.setColor(HELP_PANEL_BORDER_COLOUR);
+				gr.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+
+				// Draw text
+				text.draw(gr, VERTICAL_MARGIN, HORIZONTAL_MARGIN);
+			}
+
+			//----------------------------------------------------------
+
+		////////////////////////////////////////////////////////////////
+		//  Instance methods
+		////////////////////////////////////////////////////////////////
+
+			public void updateText()
+			{
+				text.update(getGraphics());
+			}
+
+			//----------------------------------------------------------
+
+		}
+
+		//==============================================================
+
+	}
+
+	//==================================================================
 
 }
 

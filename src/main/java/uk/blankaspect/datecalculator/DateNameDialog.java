@@ -20,7 +20,6 @@ package uk.blankaspect.datecalculator;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -70,7 +69,7 @@ class DateNameDialog
 //  Constants
 ////////////////////////////////////////////////////////////////////////
 
-	private static final	int	NAME_FIELD_NUM_COLUMNS	= 24;
+	private static final	int		NAME_FIELD_NUM_COLUMNS	= 24;
 
 	private static final	String	SET_FROM_LOCALE_STR	= "Set from locale";
 	private static final	String	CLEAR_ALL_STR		= "Clear all";
@@ -111,17 +110,30 @@ class DateNameDialog
 	};
 
 ////////////////////////////////////////////////////////////////////////
+//  Class variables
+////////////////////////////////////////////////////////////////////////
+
+	private static	Point	location;
+
+////////////////////////////////////////////////////////////////////////
+//  Instance variables
+////////////////////////////////////////////////////////////////////////
+
+	private	boolean			accepted;
+	private	List<String>	localeNames;
+	private	JTextField[]	nameFields;
+
+////////////////////////////////////////////////////////////////////////
 //  Constructors
 ////////////////////////////////////////////////////////////////////////
 
 	private DateNameDialog(Window       owner,
-						   String       titleStr,
+						   String       title,
 						   List<String> names,
 						   List<String> localeNames)
 	{
-
 		// Call superclass constructor
-		super(owner, titleStr, Dialog.ModalityType.APPLICATION_MODAL);
+		super(owner, title, ModalityType.APPLICATION_MODAL);
 
 		// Set icons
 		setIconImages(owner.getIconImages());
@@ -304,7 +316,7 @@ class DateNameDialog
 		// Resize dialog to its preferred size
 		pack();
 
-		// Set location of dialog box
+		// Set location of dialog
 		if (location == null)
 			location = GuiUtils.getComponentLocation(this, owner);
 		setLocation(location);
@@ -314,7 +326,6 @@ class DateNameDialog
 
 		// Show dialog
 		setVisible(true);
-
 	}
 
 	//------------------------------------------------------------------
@@ -324,12 +335,11 @@ class DateNameDialog
 ////////////////////////////////////////////////////////////////////////
 
 	public static List<String> showDialog(Component    parent,
-										  String       titleStr,
+										  String       title,
 										  List<String> names,
 										  List<String> localeNames)
 	{
-		return new DateNameDialog(GuiUtils.getWindow(parent), titleStr, names, localeNames).
-																								getNames();
+		return new DateNameDialog(GuiUtils.getWindow(parent), title, names, localeNames).getNames();
 	}
 
 	//------------------------------------------------------------------
@@ -425,9 +435,9 @@ class DateNameDialog
 	private void onClearAll()
 	{
 		String[] optionStrs = Utils.getOptionStrings(AppConstants.CLEAR_STR);
-		if (JOptionPane.showOptionDialog(this, CLEAR_MESSAGE_STR, CLEAR_ALL_STR,
-										 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-										 optionStrs, optionStrs[1]) == JOptionPane.OK_OPTION)
+		if (JOptionPane.showOptionDialog(this, CLEAR_MESSAGE_STR, CLEAR_ALL_STR, JOptionPane.OK_CANCEL_OPTION,
+										 JOptionPane.QUESTION_MESSAGE, null, optionStrs, optionStrs[1])
+				== JOptionPane.OK_OPTION)
 		{
 			for (JTextField nameField : nameFields)
 				nameField.setText(null);
@@ -452,20 +462,6 @@ class DateNameDialog
 	}
 
 	//------------------------------------------------------------------
-
-////////////////////////////////////////////////////////////////////////
-//  Class variables
-////////////////////////////////////////////////////////////////////////
-
-	private static	Point	location;
-
-////////////////////////////////////////////////////////////////////////
-//  Instance variables
-////////////////////////////////////////////////////////////////////////
-
-	private	boolean			accepted;
-	private	List<String>	localeNames;
-	private	JTextField[]	nameFields;
 
 }
 

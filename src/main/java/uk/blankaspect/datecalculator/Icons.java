@@ -33,10 +33,28 @@ public class Icons
 //  Constants
 ////////////////////////////////////////////////////////////////////////
 
-	public static final	ImageIcon	CALENDAR	= new ImageIcon(ImageData.CALENDAR);
-	public static final	ImageIcon	ARROW_UP	= new ImageIcon(ImageData.ARROW_UP);
+	public static final	ImageIcon	CALENDAR	= new ImageIcon(ImgData.CALENDAR);
+	public static final	ImageIcon	ARROW_UP	= new ImageIcon(ImgData.ARROW_UP);
 
-	private interface ImageData
+////////////////////////////////////////////////////////////////////////
+//  Constructors
+////////////////////////////////////////////////////////////////////////
+
+	private Icons()
+	{
+	}
+
+	//------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////
+//  Image data
+////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * PNG image data.
+	 */
+
+	private interface ImgData
 	{
 		byte[]	CALENDAR	=
 		{
@@ -77,15 +95,7 @@ public class Icons
 		};
 	}
 
-////////////////////////////////////////////////////////////////////////
-//  Constructors
-////////////////////////////////////////////////////////////////////////
-
-	private Icons()
-	{
-	}
-
-	//------------------------------------------------------------------
+	//==================================================================
 
 }
 

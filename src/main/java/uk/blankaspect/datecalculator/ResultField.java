@@ -54,7 +54,7 @@ class ResultField
 		// Call superclass constructor
 		super(numColumns);
 
-		// Set attributes
+		// Set properties
 		AppFont.TEXT_FIELD.apply(this);
 		GuiUtils.setPaddedLineBorder(this, VERTICAL_MARGIN, HORIZONTAL_MARGIN, BORDER_COLOUR);
 		setBackground(BACKGROUND_COLOUR);
