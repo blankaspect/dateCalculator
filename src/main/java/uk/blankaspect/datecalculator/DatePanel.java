@@ -145,15 +145,14 @@ class DatePanel
 //  Instance methods : ActionListener interface
 ////////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void actionPerformed(ActionEvent event)
 	{
-		String command = event.getActionCommand();
-
-		if (command.equals(Command.SELECT_DATE))
-			onSelectDate();
-
-		else if (command.equals(Command.SET_DATE_TO_TODAY))
-			onSetDateToToday();
+		switch (event.getActionCommand())
+		{
+			case Command.SELECT_DATE       -> onSelectDate();
+			case Command.SET_DATE_TO_TODAY -> onSetDateToToday();
+		}
 	}
 
 	//------------------------------------------------------------------

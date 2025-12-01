@@ -127,7 +127,7 @@ class Utils
 
 	public static char getFileSeparatorChar()
 	{
-		return (AppConfig.INSTANCE.isShowUnixPathnames() ? '/' : File.separatorChar);
+		return AppConfig.INSTANCE.isShowUnixPathnames() ? '/' : File.separatorChar;
 	}
 
 	//------------------------------------------------------------------

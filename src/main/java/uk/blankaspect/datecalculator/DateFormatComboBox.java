@@ -113,7 +113,7 @@ class DateFormatComboBox
 	public DateFormat getSelectedFormat()
 	{
 		int index = getSelectedIndex();
-		return ((index < 0) ? new DateFormat() : getItemAt(index).dateFormat);
+		return (index < 0) ? new DateFormat() : getItemAt(index).dateFormat;
 	}
 
 	//------------------------------------------------------------------

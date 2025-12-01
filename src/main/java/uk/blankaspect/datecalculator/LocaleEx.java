@@ -97,7 +97,7 @@ class LocaleEx
 	public static LocaleEx findLocale(String key)
 	{
 		int index = LOCALES.indexOf(new LocaleEx(key));
-		return ((index < 0) ? null : LOCALES.get(index));
+		return (index < 0) ? null : LOCALES.get(index);
 	}
 
 	//------------------------------------------------------------------
@@ -151,7 +151,10 @@ class LocaleEx
 	@Override
 	public boolean equals(Object obj)
 	{
-		return ((obj instanceof LocaleEx) && key.equals(((LocaleEx)obj).key));
+		if (this == obj)
+			return true;
+
+		return (obj instanceof LocaleEx other) && key.equals(other.key);
 	}
 
 	//------------------------------------------------------------------
@@ -167,7 +170,7 @@ class LocaleEx
 	@Override
 	public String toString()
 	{
-		return ((locale == null) ? DEFAULT_LOCALE_STR : key);
+		return (locale == null) ? DEFAULT_LOCALE_STR : key;
 	}
 
 	//------------------------------------------------------------------
@@ -178,7 +181,7 @@ class LocaleEx
 
 	public Locale getLocale()
 	{
-		return ((locale == null) ? Locale.getDefault() : locale);
+		return (locale == null) ? Locale.getDefault() : locale;
 	}
 
 	//------------------------------------------------------------------

@@ -44,6 +44,8 @@ import uk.blankaspect.ui.swing.misc.GuiUtils;
 
 import uk.blankaspect.ui.swing.tabbedpane.FTabbedPane;
 
+import uk.blankaspect.ui.swing.workaround.LinuxWorkarounds;
+
 //----------------------------------------------------------------------
 
 
@@ -207,16 +209,22 @@ class MainWindow
 		pack();
 
 		// Set location of window
-		AppConfig config = AppConfig.INSTANCE;
-		setLocation(config.isMainWindowLocation()
-								? GuiUtils.getLocationWithinScreen(this, config.getMainWindowLocation())
-								: GuiUtils.getComponentLocation(this));
+		Point location = AppConfig.INSTANCE.getMainWindowLocation();
+		location = (location == null)
+							? GuiUtils.getComponentLocation(this)
+							: GuiUtils.getLocationWithinScreen(this, location);
+		setLocation(location);
 
 		// Set default button
 		getRootPane().setDefaultButton(exitButton);
 
 		// Make window visible
 		setVisible(true);
+
+		// WORKAROUND for a bug that has been observed on Linux/GNOME whereby a window is displaced downwards when its
+		// location is set.  The error in the y coordinate is the height of the title bar of the window.  The workaround
+		// is to set the location of the window again with an adjustment for the error.
+		LinuxWorkarounds.fixWindowYCoord(this, location);
 	}
 
 	//------------------------------------------------------------------
@@ -229,13 +237,11 @@ class MainWindow
 	public void actionPerformed(
 		ActionEvent	event)
 	{
-		String command = event.getActionCommand();
-
-		if (command.equals(Command.EDIT_PREFERENCES))
-			onEditPreferences();
-
-		else if (command.equals(Command.EXIT))
-			onExit();
+		switch (event.getActionCommand())
+		{
+			case Command.EDIT_PREFERENCES -> onEditPreferences();
+			case Command.EXIT             -> onExit();
+		}
 	}
 
 	//------------------------------------------------------------------

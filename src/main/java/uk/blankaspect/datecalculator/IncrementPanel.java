@@ -369,26 +369,19 @@ class IncrementPanel
 //  Instance methods : ActionListener interface
 ////////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void actionPerformed(ActionEvent event)
 	{
 		try
 		{
-			String command = event.getActionCommand();
-
-			if (command.equals(Command.SELECT_DATE_FORMAT))
-				onSelectDateFormat();
-
-			else if (command.equals(Command.COPY_RESULT))
-				onCopyResult();
-
-			else if (command.equals(Command.SET_DATE_TO_RESULT))
-				onSetDateToResult();
-
-			else if (command.equals(Command.ADD))
-				onAdd();
-
-			else if (command.equals(Command.SUBTRACT))
-				onSubtract();
+			switch (event.getActionCommand())
+			{
+				case Command.SELECT_DATE_FORMAT -> onSelectDateFormat();
+				case Command.COPY_RESULT        -> onCopyResult();
+				case Command.SET_DATE_TO_RESULT -> onSetDateToResult();
+				case Command.ADD                -> onAdd();
+				case Command.SUBTRACT           -> onSubtract();
+			}
 		}
 		catch (AppException e)
 		{

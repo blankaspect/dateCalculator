@@ -20,7 +20,6 @@ package uk.blankaspect.ui.swing.container;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -157,32 +156,532 @@ public class DateSelectionPanel
 
 	private static final	KeyAction.KeyCommandPair[]	KEY_COMMANDS	=
 	{
-		new KeyAction.KeyCommandPair
-		(
-			KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0),
-			Command.PREVIOUS_MONTH
-		),
-		new KeyAction.KeyCommandPair
-		(
-			KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0),
-			Command.NEXT_MONTH
-		),
-		new KeyAction.KeyCommandPair
-		(
-			KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, KeyEvent.CTRL_DOWN_MASK),
-			Command.PREVIOUS_YEAR
-		),
-		new KeyAction.KeyCommandPair
-		(
-			KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, KeyEvent.CTRL_DOWN_MASK),
-			Command.NEXT_YEAR
-		),
-		new KeyAction.KeyCommandPair
-		(
-			KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_DOWN_MASK),
-			Command.EDIT_MONTH_YEAR
-		)
+		KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0),
+						  Command.PREVIOUS_MONTH),
+		KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0),
+						  Command.NEXT_MONTH),
+		KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, KeyEvent.CTRL_DOWN_MASK),
+						  Command.PREVIOUS_YEAR),
+		KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, KeyEvent.CTRL_DOWN_MASK),
+						  Command.NEXT_YEAR),
+		KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_DOWN_MASK),
+						  Command.EDIT_MONTH_YEAR)
 	};
+
+////////////////////////////////////////////////////////////////////////
+//  Instance variables
+////////////////////////////////////////////////////////////////////////
+
+	private	Calendar			calendar;
+	private	int					firstDayOfWeek;
+	private	boolean				showAdjacentMonths;
+	private	List<String>		monthNames;
+	private	int[]				monthNameLengths;
+	private	NavigationButton	previousMonthButton;
+	private	NavigationButton	previousYearButton;
+	private	NavigationButton	nextMonthButton;
+	private	NavigationButton	nextYearButton;
+	private	JLabel				monthLabel;
+	private	DaySelectionPanel	daySelectionPanel;
+
+////////////////////////////////////////////////////////////////////////
+//  Constructors
+////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * @throws IllegalArgumentException
+	 */
+
+	public DateSelectionPanel(Date    date,
+							  boolean showAdjacentMonths)
+	{
+		this(date.getYear(), date.getMonth(), date.getDay(), 0, showAdjacentMonths);
+	}
+
+	//------------------------------------------------------------------
+
+	/**
+	 * @throws IllegalArgumentException
+	 */
+
+	public DateSelectionPanel(Date    date,
+							  int     firstDayOfWeek,
+							  boolean showAdjacentMonths)
+	{
+		this(date.getYear(), date.getMonth(), date.getDay(), firstDayOfWeek, showAdjacentMonths);
+	}
+
+	//------------------------------------------------------------------
+
+	/**
+	 * @throws IllegalArgumentException
+	 */
+
+	public DateSelectionPanel(int     year,
+							  int     month,
+							  int     day,
+							  boolean showAdjacentMonths)
+	{
+		this(year, month, day, 0, showAdjacentMonths);
+	}
+
+	//------------------------------------------------------------------
+
+	/**
+	 * @throws IllegalArgumentException
+	 */
+
+	public DateSelectionPanel(int     year,
+							  int     month,
+							  int     day,
+							  int     firstDayOfWeek,
+							  boolean showAdjacentMonths)
+	{
+		// Validate arguments
+		if ((year < MIN_YEAR) || (year > MAX_YEAR))
+			throw new IllegalArgumentException("Year out of bounds: " + year);
+		if ((month < MIN_MONTH) || (month > MAX_MONTH))
+			throw new IllegalArgumentException("Month out of bounds: " + month);
+		if ((firstDayOfWeek < 0) || (firstDayOfWeek > Calendar.SATURDAY))
+			throw new IllegalArgumentException("First day of week out of bounds: " + firstDayOfWeek);
+
+		// Initialise instance variables
+		calendar = new ModernCalendar(year, month, 1);
+		if ((day < MIN_DAY) || (day >= calendar.getActualMaximum(Calendar.DAY_OF_MONTH)))
+			throw new IllegalArgumentException();
+		this.firstDayOfWeek = (firstDayOfWeek == 0) ? calendar.getFirstDayOfWeek() : firstDayOfWeek;
+		this.showAdjacentMonths = showAdjacentMonths;
+
+		// Initialise list of names of months
+		monthNames = DateUtils.getMonthNames(getDefaultLocale());
+		int numMonths = monthNames.size();
+
+		// Initialise array of lengths of names
+		monthNameLengths = new int[numMonths];
+		for (int i = 0; i < numMonths; i++)
+		{
+			int length = MIN_MONTH_NAME_LENGTH - 1;
+			boolean done = false;
+			while (!done)
+			{
+				++length;
+				String str0 = monthNames.get(i);
+				if (length < str0.length())
+					str0 = str0.substring(0, length);
+				int j = 0;
+				while (j < numMonths)
+				{
+					if (i != j)
+					{
+						String str1 = monthNames.get(j);
+						if (length < str1.length())
+							str1 = str1.substring(0, length);
+						if (str1.equals(str0))
+							break;
+					}
+					++j;
+				}
+				if (j == numMonths)
+					done = true;
+			}
+			monthNameLengths[i] = length;
+		}
+
+
+		//----  Control panel
+
+		GridBagLayout gridBag = new GridBagLayout();
+		GridBagConstraints gbc = new GridBagConstraints();
+
+		JPanel controlPanel = new JPanel(gridBag);
+		controlPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, NAVIGATION_PANEL_BORDER_COLOUR));
+
+		int gridX = 0;
+
+		// Button: previous year
+		previousYearButton = new NavigationButton(ANGLE_DOUBLE_LEFT_ICON);
+		previousYearButton.setToolTipText(PREVIOUS_YEAR_STR);
+		previousYearButton.setActionCommand(Command.PREVIOUS_YEAR);
+		previousYearButton.addActionListener(this);
+
+		gbc.gridx = gridX++;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.weightx = 0.0;
+		gbc.weighty = 0.0;
+		gbc.anchor = GridBagConstraints.LINE_START;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gridBag.setConstraints(previousYearButton, gbc);
+		controlPanel.add(previousYearButton);
+
+		// Button: previous month
+		previousMonthButton = new NavigationButton(ANGLE_SINGLE_LEFT_ICON);
+		previousMonthButton.setToolTipText(PREVIOUS_MONTH_STR);
+		previousMonthButton.setActionCommand(Command.PREVIOUS_MONTH);
+		previousMonthButton.addActionListener(this);
+
+		gbc.gridx = gridX++;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.weightx = 0.0;
+		gbc.weighty = 0.0;
+		gbc.anchor = GridBagConstraints.LINE_START;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(0, 1, 0, 0);
+		gridBag.setConstraints(previousMonthButton, gbc);
+		controlPanel.add(previousMonthButton);
+
+		// Label: month and year
+		monthLabel = new FLabel("");
+		monthLabel.setFont(monthLabel.getFont().deriveFont(Font.BOLD));
+		monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		FontMetrics fontMetrics = monthLabel.getFontMetrics(monthLabel.getFont());
+		int width = 0;
+		for (int i = 0; i < monthNames.size(); i++)
+		{
+			int strWidth = fontMetrics.stringWidth(getMonthString(i));
+			if (width < strWidth)
+				width = strWidth;
+		}
+		width += fontMetrics.stringWidth(" " + PROTOTYPE_YEAR_STR);
+		monthLabel.setPreferredSize(new Dimension(2 * MONTH_LABEL_HORIZONTAL_MARGIN + width,
+												  2 * MONTH_LABEL_VERTICAL_MARGIN + fontMetrics.getAscent()
+																						+ fontMetrics.getDescent()));
+		monthLabel.setOpaque(true);
+		monthLabel.setBackground(MONTH_LABEL_BACKGROUND_COLOUR);
+		monthLabel.setText(getMonthString(year, month));
+		monthLabel.addMouseListener(this);
+
+		gbc.gridx = gridX++;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gridBag.setConstraints(monthLabel, gbc);
+		controlPanel.add(monthLabel);
+
+		// Button: next month
+		nextMonthButton = new NavigationButton(ANGLE_SINGLE_RIGHT_ICON);
+		nextMonthButton.setToolTipText(NEXT_MONTH_STR);
+		nextMonthButton.setActionCommand(Command.NEXT_MONTH);
+		nextMonthButton.addActionListener(this);
+
+		gbc.gridx = gridX++;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.weightx = 0.0;
+		gbc.weighty = 0.0;
+		gbc.anchor = GridBagConstraints.LINE_END;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(0, 0, 0, 1);
+		gridBag.setConstraints(nextMonthButton, gbc);
+		controlPanel.add(nextMonthButton);
+
+		// Button: next year
+		nextYearButton = new NavigationButton(ANGLE_DOUBLE_RIGHT_ICON);
+		nextYearButton.setToolTipText(NEXT_YEAR_STR);
+		nextYearButton.setActionCommand(Command.NEXT_YEAR);
+		nextYearButton.addActionListener(this);
+
+		gbc.gridx = gridX++;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.weightx = 0.0;
+		gbc.weighty = 0.0;
+		gbc.anchor = GridBagConstraints.LINE_END;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gridBag.setConstraints(nextYearButton, gbc);
+		controlPanel.add(nextYearButton);
+
+
+		//----  Day selection panel
+
+		daySelectionPanel = new DaySelectionPanel(getDayOffset(), getDaysInMonth(), day,
+												  showAdjacentMonths ? getDaysInPrevMonth() : -1,
+												  this.firstDayOfWeek, true);
+
+
+		//----  Outer panel
+
+		setLayout(gridBag);
+
+		int gridY = 0;
+
+		gbc.gridx = 0;
+		gbc.gridy = gridY++;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.weightx = 0.0;
+		gbc.weighty = 0.0;
+		gbc.anchor = GridBagConstraints.NORTH;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gridBag.setConstraints(controlPanel, gbc);
+		add(controlPanel);
+
+		gbc.gridx = 0;
+		gbc.gridy = gridY++;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.weightx = 0.0;
+		gbc.weighty = 0.0;
+		gbc.anchor = GridBagConstraints.NORTH;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		gridBag.setConstraints(daySelectionPanel, gbc);
+		add(daySelectionPanel);
+
+		// Add commands to action map
+		KeyAction.create(this, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, this, KEY_COMMANDS);
+
+		// Update buttons
+		updateButtons();
+	}
+
+	//------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////
+//  Instance methods : ActionListener interface
+////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public void actionPerformed(ActionEvent event)
+	{
+		switch (event.getActionCommand())
+		{
+			case Command.PREVIOUS_MONTH   -> onPreviousMonth();
+			case Command.PREVIOUS_YEAR    -> onPreviousYear();
+			case Command.NEXT_MONTH       -> onNextMonth();
+			case Command.NEXT_YEAR        -> onNextYear();
+			case Command.EDIT_MONTH_YEAR  -> onEditMonthYear();
+		}
+	}
+
+	//------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////
+//  Instance methods : MouseListener interface
+////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public void mouseClicked(MouseEvent event)
+	{
+		if (SwingUtilities.isLeftMouseButton(event))
+			onEditMonthYear();
+	}
+
+	//------------------------------------------------------------------
+
+	@Override
+	public void mouseEntered(MouseEvent event)
+	{
+		// do nothing
+	}
+
+	//------------------------------------------------------------------
+
+	@Override
+	public void mouseExited(MouseEvent event)
+	{
+		// do nothing
+	}
+
+	//------------------------------------------------------------------
+
+	@Override
+	public void mousePressed(MouseEvent event)
+	{
+		// do nothing
+	}
+
+	//------------------------------------------------------------------
+
+	@Override
+	public void mouseReleased(MouseEvent event)
+	{
+		// do nothing
+	}
+
+	//------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////
+//  Instance methods : overriding methods
+////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public boolean requestFocusInWindow()
+	{
+		return daySelectionPanel.requestFocusInWindow();
+	}
+
+	//------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////
+//  Instance methods
+////////////////////////////////////////////////////////////////////////
+
+	public Date getDate()
+	{
+		int day = daySelectionPanel.getSelectedDay();
+		return (day < 0) ? null : new Date(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), day);
+	}
+
+	//------------------------------------------------------------------
+
+	public void setAcceptAction(Action action)
+	{
+		daySelectionPanel.acceptAction = action;
+	}
+
+	//------------------------------------------------------------------
+
+	private void updateButtons()
+	{
+		previousMonthButton.setEnabled((calendar.get(Calendar.MONTH) > MIN_MONTH)
+										|| (calendar.get(Calendar.YEAR) > MIN_YEAR));
+		previousYearButton.setEnabled(calendar.get(Calendar.YEAR) > MIN_YEAR);
+		nextMonthButton.setEnabled((calendar.get(Calendar.MONTH) < MAX_MONTH)
+									|| (calendar.get(Calendar.YEAR) < MAX_YEAR));
+		nextYearButton.setEnabled(calendar.get(Calendar.YEAR) < MAX_YEAR);
+	}
+
+	//------------------------------------------------------------------
+
+	private int getDayOffset()
+	{
+		int offset = calendar.get(Calendar.DAY_OF_WEEK) - firstDayOfWeek;
+		if (offset < 0)
+			offset += NUM_DAYS_IN_WEEK;
+		return offset;
+	}
+
+	//------------------------------------------------------------------
+
+	private int getDaysInMonth()
+	{
+		return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+	}
+
+	//------------------------------------------------------------------
+
+	private int getDaysInPrevMonth()
+	{
+		ModernCalendar calendar = new ModernCalendar();
+		calendar.setTimeInMillis(this.calendar.getTimeInMillis());
+		calendar.roll(Calendar.MONTH, false);
+		return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+	}
+
+	//------------------------------------------------------------------
+
+	private String getMonthString(int index)
+	{
+		String str = monthNames.get(index);
+		if (monthNameLengths[index] < str.length())
+			str = str.substring(0, monthNameLengths[index]);
+		return str;
+	}
+
+	//------------------------------------------------------------------
+
+	private String getMonthString(int year,
+								  int month)
+	{
+		return getMonthString(month) + " " + year;
+	}
+
+	//------------------------------------------------------------------
+
+	private void setMonth(int year,
+						  int month)
+	{
+		calendar = new ModernCalendar(year, month, 1);
+		int daysInMonth = getDaysInMonth();
+		int selectedDay = Math.min(daySelectionPanel.getSelectedDay(), daysInMonth - 1);
+		daySelectionPanel.setMonth(getDayOffset(), daysInMonth, selectedDay,
+								   showAdjacentMonths ? getDaysInPrevMonth() : -1);
+		monthLabel.setText(getMonthString(year, month));
+		updateButtons();
+	}
+
+	//------------------------------------------------------------------
+
+	private void onPreviousMonth()
+	{
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH);
+		if (month == MIN_MONTH)
+		{
+			if (year > MIN_YEAR)
+				setMonth(year - 1, MAX_MONTH);
+		}
+		else
+			setMonth(year, month - 1);
+	}
+
+	//------------------------------------------------------------------
+
+	private void onPreviousYear()
+	{
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH);
+		if (year > MIN_YEAR)
+			setMonth(year - 1, month);
+	}
+
+	//------------------------------------------------------------------
+
+	private void onNextMonth()
+	{
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH);
+		if (month == MAX_MONTH)
+		{
+			if (year < MAX_YEAR)
+				setMonth(year + 1, MIN_MONTH);
+		}
+		else
+			setMonth(year, month + 1);
+	}
+
+	//------------------------------------------------------------------
+
+	private void onNextYear()
+	{
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH);
+		if (year < MAX_YEAR)
+			setMonth(year + 1, month);
+	}
+
+	//------------------------------------------------------------------
+
+	private void onEditMonthYear()
+	{
+		MonthYearDialog dialog = new MonthYearDialog(SwingUtilities.getWindowAncestor(this),
+													 calendar.get(Calendar.MONTH),
+													 calendar.get(Calendar.YEAR), monthNames);
+		Point location = getLocationOnScreen();
+		location.x += (getWidth() - dialog.getWidth()) / 2;
+		location.y += monthLabel.getHeight();
+		dialog.setLocation(GuiUtils.getComponentLocation(dialog, location));
+		dialog.setVisible(true);
+
+		if (dialog.accepted)
+			setMonth(dialog.yearSpinner.getIntValue(), dialog.monthComboBox.getSelectedIndex());
+	}
+
+	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
 //  Member classes : non-inner classes
@@ -314,46 +813,22 @@ public class DateSelectionPanel
 
 		private static final	KeyAction.KeyCommandPair[]	KEY_COMMANDS	=
 		{
-			new KeyAction.KeyCommandPair
-			(
-				KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
-				Command.SELECT_UP_UNIT
-			),
-			new KeyAction.KeyCommandPair
-			(
-				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
-				Command.SELECT_DOWN_UNIT
-			),
-			new KeyAction.KeyCommandPair
-			(
-				KeyStroke.getKeyStroke(KeyEvent.VK_HOME, KeyEvent.CTRL_DOWN_MASK),
-				Command.SELECT_UP_MAX
-			),
-			new KeyAction.KeyCommandPair
-			(
-				KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_DOWN_MASK),
-				Command.SELECT_DOWN_MAX
-			),
-			new KeyAction.KeyCommandPair
-			(
-				KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
-				Command.SELECT_LEFT_UNIT
-			),
-			new KeyAction.KeyCommandPair
-			(
-				KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),
-				Command.SELECT_RIGHT_UNIT
-			),
-			new KeyAction.KeyCommandPair
-			(
-				KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0),
-				Command.SELECT_LEFT_MAX
-			),
-			new KeyAction.KeyCommandPair
-			(
-				KeyStroke.getKeyStroke(KeyEvent.VK_END, 0),
-				Command.SELECT_RIGHT_MAX
-			)
+			KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
+							  Command.SELECT_UP_UNIT),
+			KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
+							  Command.SELECT_DOWN_UNIT),
+			KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, KeyEvent.CTRL_DOWN_MASK),
+							  Command.SELECT_UP_MAX),
+			KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_DOWN_MASK),
+							  Command.SELECT_DOWN_MAX),
+			KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
+							  Command.SELECT_LEFT_UNIT),
+			KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),
+							  Command.SELECT_RIGHT_UNIT),
+			KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0),
+							  Command.SELECT_LEFT_MAX),
+			KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0),
+							  Command.SELECT_RIGHT_MAX)
 		};
 
 	////////////////////////////////////////////////////////////////////
@@ -550,31 +1025,17 @@ public class DateSelectionPanel
 		@Override
 		public void actionPerformed(ActionEvent event)
 		{
-			String command = event.getActionCommand();
-
-			if (command.equals(Command.SELECT_UP_UNIT))
-				onSelectUpUnit();
-
-			else if (command.equals(Command.SELECT_DOWN_UNIT))
-				onSelectDownUnit();
-
-			else if (command.equals(Command.SELECT_UP_MAX))
-				onSelectUpMax();
-
-			else if (command.equals(Command.SELECT_DOWN_MAX))
-				onSelectDownMax();
-
-			else if (command.equals(Command.SELECT_LEFT_UNIT))
-				onSelectLeftUnit();
-
-			else if (command.equals(Command.SELECT_RIGHT_UNIT))
-				onSelectRightUnit();
-
-			else if (command.equals(Command.SELECT_LEFT_MAX))
-				onSelectLeftMax();
-
-			else if (command.equals(Command.SELECT_RIGHT_MAX))
-				onSelectRightMax();
+			switch (event.getActionCommand())
+			{
+				case Command.SELECT_UP_UNIT    -> onSelectUpUnit();
+				case Command.SELECT_DOWN_UNIT  -> onSelectDownUnit();
+				case Command.SELECT_UP_MAX     -> onSelectUpMax();
+				case Command.SELECT_DOWN_MAX   -> onSelectDownMax();
+				case Command.SELECT_LEFT_UNIT  -> onSelectLeftUnit();
+				case Command.SELECT_RIGHT_UNIT -> onSelectRightUnit();
+				case Command.SELECT_LEFT_MAX   -> onSelectLeftMax();
+				case Command.SELECT_RIGHT_MAX  -> onSelectRightMax();
+			}
 		}
 
 		//--------------------------------------------------------------
@@ -1085,7 +1546,7 @@ public class DateSelectionPanel
 	//  Constants
 	////////////////////////////////////////////////////////////////////
 
-		private static final	int	YEAR_FIELD_LENGTH	= 4;
+		private static final	int		YEAR_FIELD_LENGTH	= 4;
 
 		private static final	Insets	BUTTON_MARGINS	= new Insets(1, 4, 1, 4);
 
@@ -1101,16 +1562,10 @@ public class DateSelectionPanel
 
 		private static final	KeyAction.KeyCommandPair[]	KEY_COMMANDS	=
 		{
-			new KeyAction.KeyCommandPair
-			(
-				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK),
-				Command.ACCEPT
-			),
-			new KeyAction.KeyCommandPair
-			(
-				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-				Command.CLOSE
-			)
+			KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK),
+							  Command.ACCEPT),
+			KeyAction.command(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+							  Command.CLOSE)
 		};
 
 	////////////////////////////////////////////////////////////////////
@@ -1131,7 +1586,7 @@ public class DateSelectionPanel
 								List<String> monthStrs)
 		{
 			// Call superclass constructor
-			super(owner, Dialog.ModalityType.APPLICATION_MODAL);
+			super(owner, ModalityType.APPLICATION_MODAL);
 
 
 			//----  Control panel
@@ -1262,13 +1717,11 @@ public class DateSelectionPanel
 		@Override
 		public void actionPerformed(ActionEvent event)
 		{
-			String command = event.getActionCommand();
-
-			if (command.equals(Command.ACCEPT))
-				onAccept();
-
-			else if (command.equals(Command.CLOSE))
-				onClose();
+			switch (event.getActionCommand())
+			{
+				case Command.ACCEPT -> onAccept();
+				case Command.CLOSE  -> onClose();
+			}
 		}
 
 		//--------------------------------------------------------------
@@ -1295,529 +1748,6 @@ public class DateSelectionPanel
 	}
 
 	//==================================================================
-
-////////////////////////////////////////////////////////////////////////
-//  Instance variables
-////////////////////////////////////////////////////////////////////////
-
-	private	Calendar			calendar;
-	private	int					firstDayOfWeek;
-	private	boolean				showAdjacentMonths;
-	private	List<String>		monthNames;
-	private	int[]				monthNameLengths;
-	private	NavigationButton	previousMonthButton;
-	private	NavigationButton	previousYearButton;
-	private	NavigationButton	nextMonthButton;
-	private	NavigationButton	nextYearButton;
-	private	JLabel				monthLabel;
-	private	DaySelectionPanel	daySelectionPanel;
-
-////////////////////////////////////////////////////////////////////////
-//  Constructors
-////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * @throws IllegalArgumentException
-	 */
-
-	public DateSelectionPanel(Date    date,
-							  boolean showAdjacentMonths)
-	{
-		this(date.getYear(), date.getMonth(), date.getDay(), 0, showAdjacentMonths);
-	}
-
-	//------------------------------------------------------------------
-
-	/**
-	 * @throws IllegalArgumentException
-	 */
-
-	public DateSelectionPanel(Date    date,
-							  int     firstDayOfWeek,
-							  boolean showAdjacentMonths)
-	{
-		this(date.getYear(), date.getMonth(), date.getDay(), firstDayOfWeek, showAdjacentMonths);
-	}
-
-	//------------------------------------------------------------------
-
-	/**
-	 * @throws IllegalArgumentException
-	 */
-
-	public DateSelectionPanel(int     year,
-							  int     month,
-							  int     day,
-							  boolean showAdjacentMonths)
-	{
-		this(year, month, day, 0, showAdjacentMonths);
-	}
-
-	//------------------------------------------------------------------
-
-	/**
-	 * @throws IllegalArgumentException
-	 */
-
-	public DateSelectionPanel(int     year,
-							  int     month,
-							  int     day,
-							  int     firstDayOfWeek,
-							  boolean showAdjacentMonths)
-	{
-		// Validate arguments
-		if ((year < MIN_YEAR) || (year > MAX_YEAR))
-			throw new IllegalArgumentException("Year out of bounds: " + year);
-		if ((month < MIN_MONTH) || (month > MAX_MONTH))
-			throw new IllegalArgumentException("Month out of bounds: " + month);
-		if ((firstDayOfWeek < 0) || (firstDayOfWeek > Calendar.SATURDAY))
-			throw new IllegalArgumentException("First day of week out of bounds: " + firstDayOfWeek);
-
-		// Initialise instance variables
-		calendar = new ModernCalendar(year, month, 1);
-		if ((day < MIN_DAY) || (day >= calendar.getActualMaximum(Calendar.DAY_OF_MONTH)))
-			throw new IllegalArgumentException();
-		this.firstDayOfWeek = (firstDayOfWeek == 0) ? calendar.getFirstDayOfWeek() : firstDayOfWeek;
-		this.showAdjacentMonths = showAdjacentMonths;
-
-		// Initialise list of names of months
-		monthNames = DateUtils.getMonthNames(getDefaultLocale());
-		int numMonths = monthNames.size();
-
-		// Initialise array of lengths of names
-		monthNameLengths = new int[numMonths];
-		for (int i = 0; i < numMonths; i++)
-		{
-			int length = MIN_MONTH_NAME_LENGTH - 1;
-			boolean done = false;
-			while (!done)
-			{
-				++length;
-				String str0 = monthNames.get(i);
-				if (length < str0.length())
-					str0 = str0.substring(0, length);
-				int j = 0;
-				while (j < numMonths)
-				{
-					if (i != j)
-					{
-						String str1 = monthNames.get(j);
-						if (length < str1.length())
-							str1 = str1.substring(0, length);
-						if (str1.equals(str0))
-							break;
-					}
-					++j;
-				}
-				if (j == numMonths)
-					done = true;
-			}
-			monthNameLengths[i] = length;
-		}
-
-
-		//----  Control panel
-
-		GridBagLayout gridBag = new GridBagLayout();
-		GridBagConstraints gbc = new GridBagConstraints();
-
-		JPanel controlPanel = new JPanel(gridBag);
-		controlPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, NAVIGATION_PANEL_BORDER_COLOUR));
-
-		int gridX = 0;
-
-		// Button: previous year
-		previousYearButton = new NavigationButton(ANGLE_DOUBLE_LEFT_ICON);
-		previousYearButton.setToolTipText(PREVIOUS_YEAR_STR);
-		previousYearButton.setActionCommand(Command.PREVIOUS_YEAR);
-		previousYearButton.addActionListener(this);
-
-		gbc.gridx = gridX++;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		gbc.anchor = GridBagConstraints.LINE_START;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gridBag.setConstraints(previousYearButton, gbc);
-		controlPanel.add(previousYearButton);
-
-		// Button: previous month
-		previousMonthButton = new NavigationButton(ANGLE_SINGLE_LEFT_ICON);
-		previousMonthButton.setToolTipText(PREVIOUS_MONTH_STR);
-		previousMonthButton.setActionCommand(Command.PREVIOUS_MONTH);
-		previousMonthButton.addActionListener(this);
-
-		gbc.gridx = gridX++;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		gbc.anchor = GridBagConstraints.LINE_START;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = new Insets(0, 1, 0, 0);
-		gridBag.setConstraints(previousMonthButton, gbc);
-		controlPanel.add(previousMonthButton);
-
-		// Label: month and year
-		monthLabel = new FLabel("");
-		monthLabel.setFont(monthLabel.getFont().deriveFont(Font.BOLD));
-		monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		FontMetrics fontMetrics = monthLabel.getFontMetrics(monthLabel.getFont());
-		int width = 0;
-		for (int i = 0; i < monthNames.size(); i++)
-		{
-			int strWidth = fontMetrics.stringWidth(getMonthString(i));
-			if (width < strWidth)
-				width = strWidth;
-		}
-		width += fontMetrics.stringWidth(" " + PROTOTYPE_YEAR_STR);
-		monthLabel.setPreferredSize(new Dimension(2 * MONTH_LABEL_HORIZONTAL_MARGIN + width,
-												  2 * MONTH_LABEL_VERTICAL_MARGIN + fontMetrics.getAscent()
-																						+ fontMetrics.getDescent()));
-		monthLabel.setOpaque(true);
-		monthLabel.setBackground(MONTH_LABEL_BACKGROUND_COLOUR);
-		monthLabel.setText(getMonthString(year, month));
-		monthLabel.addMouseListener(this);
-
-		gbc.gridx = gridX++;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 1.0;
-		gbc.weighty = 0.0;
-		gbc.anchor = GridBagConstraints.CENTER;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gridBag.setConstraints(monthLabel, gbc);
-		controlPanel.add(monthLabel);
-
-		// Button: next month
-		nextMonthButton = new NavigationButton(ANGLE_SINGLE_RIGHT_ICON);
-		nextMonthButton.setToolTipText(NEXT_MONTH_STR);
-		nextMonthButton.setActionCommand(Command.NEXT_MONTH);
-		nextMonthButton.addActionListener(this);
-
-		gbc.gridx = gridX++;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		gbc.anchor = GridBagConstraints.LINE_END;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = new Insets(0, 0, 0, 1);
-		gridBag.setConstraints(nextMonthButton, gbc);
-		controlPanel.add(nextMonthButton);
-
-		// Button: next year
-		nextYearButton = new NavigationButton(ANGLE_DOUBLE_RIGHT_ICON);
-		nextYearButton.setToolTipText(NEXT_YEAR_STR);
-		nextYearButton.setActionCommand(Command.NEXT_YEAR);
-		nextYearButton.addActionListener(this);
-
-		gbc.gridx = gridX++;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		gbc.anchor = GridBagConstraints.LINE_END;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gridBag.setConstraints(nextYearButton, gbc);
-		controlPanel.add(nextYearButton);
-
-
-		//----  Day selection panel
-
-		daySelectionPanel = new DaySelectionPanel(getDayOffset(), getDaysInMonth(), day,
-												  showAdjacentMonths ? getDaysInPrevMonth() : -1,
-												  this.firstDayOfWeek, true);
-
-
-		//----  Outer panel
-
-		setLayout(gridBag);
-
-		int gridY = 0;
-
-		gbc.gridx = 0;
-		gbc.gridy = gridY++;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		gbc.anchor = GridBagConstraints.NORTH;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gridBag.setConstraints(controlPanel, gbc);
-		add(controlPanel);
-
-		gbc.gridx = 0;
-		gbc.gridy = gridY++;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		gbc.anchor = GridBagConstraints.NORTH;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gridBag.setConstraints(daySelectionPanel, gbc);
-		add(daySelectionPanel);
-
-		// Add commands to action map
-		KeyAction.create(this, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, this, KEY_COMMANDS);
-
-		// Update buttons
-		updateButtons();
-	}
-
-	//------------------------------------------------------------------
-
-////////////////////////////////////////////////////////////////////////
-//  Instance methods : ActionListener interface
-////////////////////////////////////////////////////////////////////////
-
-	@Override
-	public void actionPerformed(ActionEvent event)
-	{
-		String command = event.getActionCommand();
-
-		if (command.equals(Command.PREVIOUS_MONTH))
-			onPreviousMonth();
-
-		else if (command.equals(Command.PREVIOUS_YEAR))
-			onPreviousYear();
-
-		else if (command.equals(Command.NEXT_MONTH))
-			onNextMonth();
-
-		else if (command.equals(Command.NEXT_YEAR))
-			onNextYear();
-
-		else if (command.equals(Command.EDIT_MONTH_YEAR))
-			onEditMonthYear();
-	}
-
-	//------------------------------------------------------------------
-
-////////////////////////////////////////////////////////////////////////
-//  Instance methods : MouseListener interface
-////////////////////////////////////////////////////////////////////////
-
-	@Override
-	public void mouseClicked(MouseEvent event)
-	{
-		if (SwingUtilities.isLeftMouseButton(event))
-			onEditMonthYear();
-	}
-
-	//------------------------------------------------------------------
-
-	@Override
-	public void mouseEntered(MouseEvent event)
-	{
-		// do nothing
-	}
-
-	//------------------------------------------------------------------
-
-	@Override
-	public void mouseExited(MouseEvent event)
-	{
-		// do nothing
-	}
-
-	//------------------------------------------------------------------
-
-	@Override
-	public void mousePressed(MouseEvent event)
-	{
-		// do nothing
-	}
-
-	//------------------------------------------------------------------
-
-	@Override
-	public void mouseReleased(MouseEvent event)
-	{
-		// do nothing
-	}
-
-	//------------------------------------------------------------------
-
-////////////////////////////////////////////////////////////////////////
-//  Instance methods : overriding methods
-////////////////////////////////////////////////////////////////////////
-
-	@Override
-	public boolean requestFocusInWindow()
-	{
-		return daySelectionPanel.requestFocusInWindow();
-	}
-
-	//------------------------------------------------------------------
-
-////////////////////////////////////////////////////////////////////////
-//  Instance methods
-////////////////////////////////////////////////////////////////////////
-
-	public Date getDate()
-	{
-		int day = daySelectionPanel.getSelectedDay();
-		return ((day < 0) ? null : new Date(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), day));
-	}
-
-	//------------------------------------------------------------------
-
-	public void setAcceptAction(Action action)
-	{
-		daySelectionPanel.acceptAction = action;
-	}
-
-	//------------------------------------------------------------------
-
-	private void updateButtons()
-	{
-		previousMonthButton.setEnabled((calendar.get(Calendar.MONTH) > MIN_MONTH)
-										|| (calendar.get(Calendar.YEAR) > MIN_YEAR));
-		previousYearButton.setEnabled(calendar.get(Calendar.YEAR) > MIN_YEAR);
-		nextMonthButton.setEnabled((calendar.get(Calendar.MONTH) < MAX_MONTH)
-									|| (calendar.get(Calendar.YEAR) < MAX_YEAR));
-		nextYearButton.setEnabled(calendar.get(Calendar.YEAR) < MAX_YEAR);
-	}
-
-	//------------------------------------------------------------------
-
-	private int getDayOffset()
-	{
-		int offset = calendar.get(Calendar.DAY_OF_WEEK) - firstDayOfWeek;
-		if (offset < 0)
-			offset += NUM_DAYS_IN_WEEK;
-		return offset;
-	}
-
-	//------------------------------------------------------------------
-
-	private int getDaysInMonth()
-	{
-		return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-	}
-
-	//------------------------------------------------------------------
-
-	private int getDaysInPrevMonth()
-	{
-		ModernCalendar calendar = new ModernCalendar();
-		calendar.setTimeInMillis(this.calendar.getTimeInMillis());
-		calendar.roll(Calendar.MONTH, false);
-		return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-	}
-
-	//------------------------------------------------------------------
-
-	private String getMonthString(int index)
-	{
-		String str = monthNames.get(index);
-		if (monthNameLengths[index] < str.length())
-			str = str.substring(0, monthNameLengths[index]);
-		return str;
-	}
-
-	//------------------------------------------------------------------
-
-	private String getMonthString(int year,
-								  int month)
-	{
-		return (getMonthString(month) + " " + Integer.toString(year));
-	}
-
-	//------------------------------------------------------------------
-
-	private void setMonth(int year,
-						  int month)
-	{
-		calendar = new ModernCalendar(year, month, 1);
-		int daysInMonth = getDaysInMonth();
-		int selectedDay = Math.min(daySelectionPanel.getSelectedDay(), daysInMonth - 1);
-		daySelectionPanel.setMonth(getDayOffset(), daysInMonth, selectedDay,
-								   showAdjacentMonths ? getDaysInPrevMonth() : -1);
-		monthLabel.setText(getMonthString(year, month));
-		updateButtons();
-	}
-
-	//------------------------------------------------------------------
-
-	private void onPreviousMonth()
-	{
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH);
-		if (month == MIN_MONTH)
-		{
-			if (year > MIN_YEAR)
-				setMonth(year - 1, MAX_MONTH);
-		}
-		else
-			setMonth(year, month - 1);
-	}
-
-	//------------------------------------------------------------------
-
-	private void onPreviousYear()
-	{
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH);
-		if (year > MIN_YEAR)
-			setMonth(year - 1, month);
-	}
-
-	//------------------------------------------------------------------
-
-	private void onNextMonth()
-	{
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH);
-		if (month == MAX_MONTH)
-		{
-			if (year < MAX_YEAR)
-				setMonth(year + 1, MIN_MONTH);
-		}
-		else
-			setMonth(year, month + 1);
-	}
-
-	//------------------------------------------------------------------
-
-	private void onNextYear()
-	{
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH);
-		if (year < MAX_YEAR)
-			setMonth(year + 1, month);
-	}
-
-	//------------------------------------------------------------------
-
-	private void onEditMonthYear()
-	{
-		MonthYearDialog dialog = new MonthYearDialog(SwingUtilities.getWindowAncestor(this),
-													 calendar.get(Calendar.MONTH),
-													 calendar.get(Calendar.YEAR), monthNames);
-		Point location = getLocationOnScreen();
-		location.x += (getWidth() - dialog.getWidth()) / 2;
-		location.y += monthLabel.getHeight();
-		dialog.setLocation(GuiUtils.getComponentLocation(dialog, location));
-		dialog.setVisible(true);
-
-		if (dialog.accepted)
-			setMonth(dialog.yearSpinner.getIntValue(), dialog.monthComboBox.getSelectedIndex());
-	}
-
-	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
 //  Image data

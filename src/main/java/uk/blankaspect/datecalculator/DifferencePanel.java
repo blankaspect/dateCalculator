@@ -299,13 +299,11 @@ class DifferencePanel
 	{
 		try
 		{
-			String command = event.getActionCommand();
-
-			if (command.equals(Command.COPY_RESULT))
-				onCopyResult();
-
-			else if (command.equals(Command.SUBTRACT))
-				onSubtract();
+			switch (event.getActionCommand())
+			{
+				case Command.COPY_RESULT -> onCopyResult();
+				case Command.SUBTRACT    -> onSubtract();
+			}
 		}
 		catch (AppException e)
 		{

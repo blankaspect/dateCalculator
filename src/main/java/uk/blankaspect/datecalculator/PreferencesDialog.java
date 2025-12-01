@@ -42,7 +42,6 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -100,6 +99,10 @@ import uk.blankaspect.ui.swing.text.TextRendering;
 
 import uk.blankaspect.ui.swing.textfield.IntegerValueField;
 
+import uk.blankaspect.ui.swing.window.WindowUtils;
+
+import uk.blankaspect.ui.swing.workaround.LinuxWorkarounds;
+
 //----------------------------------------------------------------------
 
 
@@ -116,8 +119,8 @@ class PreferencesDialog
 ////////////////////////////////////////////////////////////////////////
 
 	// Main panel
-	private static final	int		MODIFIERS_MASK	= ActionEvent.ALT_MASK | ActionEvent.META_MASK |
-															ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK;
+	private static final	int		MODIFIERS_MASK	=
+			ActionEvent.ALT_MASK | ActionEvent.META_MASK | ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK;
 
 	private static final	String	TITLE_STR				= "Preferences";
 	private static final	String	SAVE_CONFIGURATION_STR	= "Save configuration";
@@ -179,553 +182,58 @@ class PreferencesDialog
 		String	CLOSE						= "close";
 	}
 
-	private static final	Map<String, String>	COMMAND_MAP;
+	private static final	Map<String, String>	COMMAND_MAP	= Map.of
+	(
+		SingleSelectionList.Command.EDIT_ELEMENT,      Command.EDIT_DATE_FORMAT,
+		SingleSelectionList.Command.DELETE_ELEMENT,    Command.CONFIRM_DELETE_DATE_FORMAT,
+		SingleSelectionList.Command.DELETE_EX_ELEMENT, Command.DELETE_DATE_FORMAT,
+		SingleSelectionList.Command.MOVE_ELEMENT_UP,   Command.MOVE_DATE_FORMAT_UP,
+		SingleSelectionList.Command.MOVE_ELEMENT_DOWN, Command.MOVE_DATE_FORMAT_DOWN,
+		SingleSelectionList.Command.DRAG_ELEMENT,      Command.MOVE_DATE_FORMAT
+	);
 
 ////////////////////////////////////////////////////////////////////////
-//  Enumerated types
+//  Class variables
 ////////////////////////////////////////////////////////////////////////
 
-
-	// TABS
-
-
-	private enum Tab
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		GENERAL
-		(
-			"General"
-		)
-		{
-			@Override
-			protected JPanel createPanel(PreferencesDialog dialog)
-			{
-				return dialog.createPanelGeneral();
-			}
-
-			//----------------------------------------------------------
-
-			@Override
-			protected void validatePreferences(PreferencesDialog dialog)
-				throws AppException
-			{
-				dialog.validatePreferencesGeneral();
-			}
-
-			//----------------------------------------------------------
-
-			@Override
-			protected void setPreferences(PreferencesDialog dialog)
-			{
-				dialog.setPreferencesGeneral();
-			}
-
-			//----------------------------------------------------------
-		},
-
-		APPEARANCE
-		(
-			"Appearance"
-		)
-		{
-			@Override
-			protected JPanel createPanel(PreferencesDialog dialog)
-			{
-				return dialog.createPanelAppearance();
-			}
-
-			//----------------------------------------------------------
-
-			@Override
-			protected void validatePreferences(PreferencesDialog dialog)
-				throws AppException
-			{
-				dialog.validatePreferencesAppearance();
-			}
-
-			//----------------------------------------------------------
-
-			@Override
-			protected void setPreferences(PreferencesDialog dialog)
-			{
-				dialog.setPreferencesAppearance();
-			}
-
-			//----------------------------------------------------------
-		},
-
-		DATE
-		(
-			"Date"
-		)
-		{
-			@Override
-			protected JPanel createPanel(PreferencesDialog dialog)
-			{
-				return dialog.createPanelDate();
-			}
-
-			//----------------------------------------------------------
-
-			@Override
-			protected void validatePreferences(PreferencesDialog dialog)
-				throws AppException
-			{
-				dialog.validatePreferencesDate();
-			}
-
-			//----------------------------------------------------------
-
-			@Override
-			protected void setPreferences(PreferencesDialog dialog)
-			{
-				dialog.setPreferencesDate();
-			}
-
-			//----------------------------------------------------------
-		},
-
-		FONTS
-		(
-			"Fonts"
-		)
-		{
-			@Override
-			protected JPanel createPanel(PreferencesDialog dialog)
-			{
-				return dialog.createPanelFonts();
-			}
-
-			//----------------------------------------------------------
-
-			@Override
-			protected void validatePreferences(PreferencesDialog dialog)
-				throws AppException
-			{
-				dialog.validatePreferencesFonts();
-			}
-
-			//----------------------------------------------------------
-
-			@Override
-			protected void setPreferences(PreferencesDialog dialog)
-			{
-				dialog.setPreferencesFonts();
-			}
-
-			//----------------------------------------------------------
-		};
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private Tab(String text)
-		{
-			this.text = text;
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Abstract methods
-	////////////////////////////////////////////////////////////////////
-
-		protected abstract JPanel createPanel(PreferencesDialog dialog);
-
-		//--------------------------------------------------------------
-
-		protected abstract void validatePreferences(PreferencesDialog dialog)
-			throws AppException;
-
-		//--------------------------------------------------------------
-
-		protected abstract void setPreferences(PreferencesDialog dialog);
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance variables
-	////////////////////////////////////////////////////////////////////
-
-		private	String	text;
-
-	}
-
-	//==================================================================
+	private static	Point	location;
+	private static	int		tabIndex;
 
 ////////////////////////////////////////////////////////////////////////
-//  Member classes : non-inner classes
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
-
-	// DATE-FORMAT SELECTION LIST CLASS
-
-
-	private static class DateFormatSelectionList
-		extends SingleSelectionList<DateFormat>
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		private static final	int	NAME_FIELD_NUM_COLUMNS		= 16;
-		private static final	int	PATTERN_FIELD_NUM_COLUMNS	= 32;
-		private static final	int	NUM_ROWS					= 8;
-
-		private static final	int	SEPARATOR_WIDTH	= 1;
-
-		private static final	Color	SEPARATOR_COLOUR	= new Color(192, 200, 192);
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private DateFormatSelectionList(List<DateFormat> formats)
-		{
-			super(NAME_FIELD_NUM_COLUMNS + PATTERN_FIELD_NUM_COLUMNS, NUM_ROWS, AppFont.MAIN.getFont(),
-				  formats);
-			setExtraWidth(2 * getHorizontalMargin() + SEPARATOR_WIDTH);
-			setRowHeight(getRowHeight() + 1);
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods : overriding methods
-	////////////////////////////////////////////////////////////////////
-
-		@Override
-		protected void drawElement(Graphics gr,
-								   int      index)
-		{
-			// Create copy of graphics context
-			gr = gr.create();
-
-			// Set rendering hints for text antialiasing and fractional metrics
-			TextRendering.setHints((Graphics2D)gr);
-
-			// Get date format
-			DateFormat dateFormat = getElement(index);
-
-			// Get name text and truncate it if it is too wide
-			FontMetrics fontMetrics = gr.getFontMetrics();
-			int nameFieldWidth = NAME_FIELD_NUM_COLUMNS * getColumnWidth();
-			int patternFieldWidth = getMaxTextWidth() - nameFieldWidth;
-			String text = truncateText(dateFormat.getName(), fontMetrics, nameFieldWidth);
-
-			// Draw name text
-			int rowHeight = getRowHeight();
-			int x = getHorizontalMargin();
-			int y = index * rowHeight;
-			int textY = y + DEFAULT_VERTICAL_MARGIN + fontMetrics.getAscent();
-			gr.setColor(getForegroundColour(index));
-			gr.drawString(text, x, textY);
-
-			// Get pattern text and truncate it if it is too wide
-			text = truncateText(dateFormat.getPattern(), fontMetrics, patternFieldWidth);
-
-			// Draw pattern text
-			x += nameFieldWidth + getExtraWidth();
-			gr.drawString(text, x, textY);
-
-			// Draw separator
-			x = getHorizontalMargin() + nameFieldWidth + getExtraWidth() / 2;
-			gr.setColor(SEPARATOR_COLOUR);
-			gr.drawLine(x, y, x, y + rowHeight - 1);
-
-			// Draw bottom border
-			y += rowHeight - 1;
-			gr.drawLine(0, y, getWidth() - 1, y);
-		}
-
-		//--------------------------------------------------------------
-
-		@Override
-		protected String getPopUpText(int index)
-		{
-			DateFormat dateFormat = getElement(index);
-			return (dateFormat.getName() + " : " + dateFormat.getPattern());
-		}
-
-		//--------------------------------------------------------------
-
-		@Override
-		protected boolean isShowPopUp(int index)
-		{
-			DateFormat dateFormat = getElement(index);
-			FontMetrics fontMetrics = getFontMetrics(getFont());
-			int nameFieldWidth = NAME_FIELD_NUM_COLUMNS * getColumnWidth();
-			int patternFieldWidth = getMaxTextWidth() - nameFieldWidth;
-			return ((fontMetrics.stringWidth(dateFormat.getName()) > nameFieldWidth) ||
-					 (fontMetrics.stringWidth(dateFormat.getPattern()) > patternFieldWidth));
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods
-	////////////////////////////////////////////////////////////////////
-
-		private List<String> getNames(int index)
-		{
-			List<String> names = new ArrayList<>();
-			for (int i = 0; i < getNumElements(); i++)
-			{
-				if (i != index)
-					names.add(getElement(i).getName());
-			}
-			return names;
-		}
-
-		//--------------------------------------------------------------
-
-	}
-
-	//==================================================================
-
-
-	// DATE PANEL CLASS
-
-
-	private static class DatePanel
-		extends FixedWidthPanel
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		private static final	String	KEY	= DatePanel.class.getCanonicalName();
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private DatePanel(LayoutManager layout)
-		{
-			super(layout);
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Class methods
-	////////////////////////////////////////////////////////////////////
-
-		private static void reset()
-		{
-			MaxValueMap.removeAll(KEY);
-		}
-
-		//--------------------------------------------------------------
-
-		private static void update()
-		{
-			MaxValueMap.update(KEY);
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods : overriding methods
-	////////////////////////////////////////////////////////////////////
-
-		@Override
-		protected String getKey()
-		{
-			return KEY;
-		}
-
-		//--------------------------------------------------------------
-
-	}
-
-	//==================================================================
-
-
-	// DATE PANEL LABEL CLASS
-
-
-	private static class DatePanelLabel
-		extends FixedWidthLabel
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		private static final	String	KEY	= DatePanelLabel.class.getCanonicalName();
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private DatePanelLabel(String text)
-		{
-			super(text);
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Class methods
-	////////////////////////////////////////////////////////////////////
-
-		private static void reset()
-		{
-			MaxValueMap.removeAll(KEY);
-		}
-
-		//--------------------------------------------------------------
-
-		private static void update()
-		{
-			MaxValueMap.update(KEY);
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods : overriding methods
-	////////////////////////////////////////////////////////////////////
-
-		@Override
-		protected String getKey()
-		{
-			return KEY;
-		}
-
-		//--------------------------------------------------------------
-
-	}
-
-	//==================================================================
-
-
-	// FONT PANEL CLASS
-
-
-	private static class FontPanel
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		private static final	int	MIN_SIZE	= 0;
-		private static final	int	MAX_SIZE	= 99;
-
-		private static final	int	SIZE_FIELD_LENGTH	= 2;
-
-		private static final	String	DEFAULT_FONT_STR	= "<default font>";
-
-	////////////////////////////////////////////////////////////////////
-	//  Member classes : non-inner classes
-	////////////////////////////////////////////////////////////////////
-
-
-		// SIZE SPINNER CLASS
-
-
-		private static class SizeSpinner
-			extends IntegerSpinner
-		{
-
-		////////////////////////////////////////////////////////////////
-		//  Constructors
-		////////////////////////////////////////////////////////////////
-
-			private SizeSpinner(int value)
-			{
-				super(value, MIN_SIZE, MAX_SIZE, SIZE_FIELD_LENGTH);
-				AppFont.TEXT_FIELD.apply(this);
-			}
-
-			//----------------------------------------------------------
-
-		////////////////////////////////////////////////////////////////
-		//  Instance methods : overriding methods
-		////////////////////////////////////////////////////////////////
-
-			/**
-			 * @throws NumberFormatException
-			 */
-
-			@Override
-			protected int getEditorValue()
-			{
-				IntegerValueField field = (IntegerValueField)getEditor();
-				return (field.isEmpty() ? 0 : field.getValue());
-			}
-
-			//----------------------------------------------------------
-
-			@Override
-			protected void setEditorValue(int value)
-			{
-				IntegerValueField field = (IntegerValueField)getEditor();
-				if (value == 0)
-					field.setText(null);
-				else
-					field.setValue(value);
-			}
-
-			//----------------------------------------------------------
-
-		}
-
-		//==============================================================
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private FontPanel(FontEx   font,
-						  String[] fontNames)
-		{
-			nameComboBox = new FComboBox<>();
-			nameComboBox.addItem(DEFAULT_FONT_STR);
-			for (String fontName : fontNames)
-				nameComboBox.addItem(fontName);
-			nameComboBox.setSelectedIndex(Utils.indexOf(font.getName(), fontNames) + 1);
-
-			styleComboBox = new FComboBox<>(FontStyle.values());
-			styleComboBox.setSelectedValue(font.getStyle());
-
-			sizeSpinner = new SizeSpinner(font.getSize());
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods
-	////////////////////////////////////////////////////////////////////
-
-		public FontEx getFont()
-		{
-			String name = (nameComboBox.getSelectedIndex() <= 0) ? null : nameComboBox.getSelectedValue();
-			return new FontEx(name, styleComboBox.getSelectedValue(), sizeSpinner.getIntValue());
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance variables
-	////////////////////////////////////////////////////////////////////
-
-		private	FComboBox<String>		nameComboBox;
-		private	FComboBox<FontStyle>	styleComboBox;
-		private	SizeSpinner				sizeSpinner;
-
-	}
-
-	//==================================================================
+	// Main panel
+	private	boolean									accepted;
+	private	JTabbedPane								tabbedPanel;
+
+	// General panel
+	private	BooleanComboBox							showUnixPathnamesComboBox;
+	private	BooleanComboBox							selectTextOnFocusGainedComboBox;
+	private	BooleanComboBox							saveMainWindowLocationComboBox;
+
+	// Appearance panel
+	private	FComboBox<String>						lookAndFeelComboBox;
+	private	FComboBox<TextRendering.Antialiasing>	textAntialiasingComboBox;
+	private	BooleanComboBox							showAdjacentMonthsComboBox;
+
+	// Date panel
+	private	DateFormatSelectionList					dateFormatList;
+	private	JScrollPane								dateFormatListScrollPane;
+	private	JButton									dateFormatAddButton;
+	private	JButton									dateFormatEditButton;
+	private	JButton									dateFormatDeleteButton;
+	private	FComboBox<DateNamesSource>				dateNamesSourceComboBox;
+	private	FComboBox<LocaleEx>						dateNamesLocaleComboBox;
+	private	JButton									editMonthNamesButton;
+	private	JButton									editDayNamesButton;
+	private	Map<DateNamesSource, List<Component>>	dateNamesComponents;
+	private	List<String>							monthNames;
+	private	List<String>							dayNames;
+	private	FComboBox<String>						firstDayOfWeekComboBox;
+
+	// Fonts panel
+	private	FontPanel[]								fontPanels;
 
 ////////////////////////////////////////////////////////////////////////
 //  Constructors
@@ -855,11 +363,22 @@ class PreferencesDialog
 		// Dispose of window explicitly
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-		// Handle window closing
+		// Handle window events
 		addWindowListener(new WindowAdapter()
 		{
 			@Override
-			public void windowClosing(WindowEvent event)
+			public void windowOpened(
+				WindowEvent	event)
+			{
+				// WORKAROUND for a bug that has been observed on Linux/GNOME whereby a window is displaced downwards
+				// when its location is set.  The error in the y coordinate is the height of the title bar of the
+				// window.  The workaround is to set the location of the window again with an adjustment for the error.
+				LinuxWorkarounds.fixWindowYCoord(event.getWindow(), location);
+			}
+
+			@Override
+			public void windowClosing(
+				WindowEvent	event)
 			{
 				onClose();
 			}
@@ -900,53 +419,33 @@ class PreferencesDialog
 //  Instance methods : ActionListener interface
 ////////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void actionPerformed(ActionEvent event)
 	{
 		String command = event.getActionCommand();
-		if (command.equals(Command.CONFIRM_DELETE_DATE_FORMAT) &&
-			 ((event.getModifiers() & MODIFIERS_MASK) == ActionEvent.SHIFT_MASK))
+
+		if (command.equals(Command.CONFIRM_DELETE_DATE_FORMAT)
+				&& ((event.getModifiers() & MODIFIERS_MASK) == ActionEvent.SHIFT_MASK))
 			command = Command.DELETE_DATE_FORMAT;
 		else if (COMMAND_MAP.containsKey(command))
 			command = COMMAND_MAP.get(command);
 
-		if (command.equals(Command.ADD_DATE_FORMAT))
-			onAddDateFormat();
-
-		else if (command.equals(Command.EDIT_DATE_FORMAT))
-			onEditDateFormat();
-
-		else if (command.equals(Command.DELETE_DATE_FORMAT))
-			onDeleteDateFormat();
-
-		else if (command.equals(Command.CONFIRM_DELETE_DATE_FORMAT))
-			onConfirmDeleteDateFormat();
-
-		else if (command.equals(Command.MOVE_DATE_FORMAT_UP))
-			onMoveDateFormatUp();
-
-		else if (command.equals(Command.MOVE_DATE_FORMAT_DOWN))
-			onMoveDateFormatDown();
-
-		else if (command.equals(Command.MOVE_DATE_FORMAT))
-			onMoveDateFormat();
-
-		else if (command.equals(Command.SELECT_DATE_NAMES_SOURCE))
-			onSelectDateNamesSource();
-
-		else if (command.equals(Command.EDIT_MONTH_NAMES))
-			onEditMonthNames();
-
-		else if (command.equals(Command.EDIT_DAY_NAMES))
-			onEditDayNames();
-
-		else if (command.equals(Command.SAVE_CONFIGURATION))
-			onSaveConfiguration();
-
-		else if (command.equals(Command.ACCEPT))
-			onAccept();
-
-		else if (command.equals(Command.CLOSE))
-			onClose();
+		switch (command)
+		{
+			case Command.ADD_DATE_FORMAT            -> onAddDateFormat();
+			case Command.EDIT_DATE_FORMAT           -> onEditDateFormat();
+			case Command.DELETE_DATE_FORMAT         -> onDeleteDateFormat();
+			case Command.CONFIRM_DELETE_DATE_FORMAT -> onConfirmDeleteDateFormat();
+			case Command.MOVE_DATE_FORMAT_UP        -> onMoveDateFormatUp();
+			case Command.MOVE_DATE_FORMAT_DOWN      -> onMoveDateFormatDown();
+			case Command.MOVE_DATE_FORMAT           -> onMoveDateFormat();
+			case Command.SELECT_DATE_NAMES_SOURCE   -> onSelectDateNamesSource();
+			case Command.EDIT_MONTH_NAMES           -> onEditMonthNames();
+			case Command.EDIT_DAY_NAMES             -> onEditDayNames();
+			case Command.SAVE_CONFIGURATION         -> onSaveConfiguration();
+			case Command.ACCEPT                     -> onAccept();
+			case Command.CLOSE                      -> onClose();
+		}
 	}
 
 	//------------------------------------------------------------------
@@ -955,6 +454,7 @@ class PreferencesDialog
 //  Instance methods : ChangeListener interface
 ////////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void stateChanged(ChangeEvent event)
 	{
 		if (!dateFormatListScrollPane.getVerticalScrollBar().getValueIsAdjusting() &&
@@ -968,6 +468,7 @@ class PreferencesDialog
 //  Instance methods : ListSelectionListener interface
 ////////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void valueChanged(ListSelectionEvent event)
 	{
 		if (!event.getValueIsAdjusting())
@@ -1157,8 +658,7 @@ class PreferencesDialog
 				{
 					setPreferences();
 					accepted = true;
-					TaskProgressDialog.showDialog(this, WRITE_CONFIG_FILE_STR,
-												  new Task.WriteConfig(file));
+					TaskProgressDialog.showDialog(this, WRITE_CONFIG_FILE_STR, new Task.WriteConfig(file));
 				}
 			}
 		}
@@ -1201,7 +701,6 @@ class PreferencesDialog
 
 	private JPanel createPanelGeneral()
 	{
-
 		//----  Control panel
 
 		GridBagLayout gridBag = new GridBagLayout();
@@ -1323,14 +822,12 @@ class PreferencesDialog
 		outerPanel.add(controlPanel);
 
 		return outerPanel;
-
 	}
 
 	//------------------------------------------------------------------
 
 	private JPanel createPanelAppearance()
 	{
-
 		//----  Control panel
 
 		GridBagLayout gridBag = new GridBagLayout();
@@ -1471,14 +968,12 @@ class PreferencesDialog
 		outerPanel.add(controlPanel);
 
 		return outerPanel;
-
 	}
 
 	//------------------------------------------------------------------
 
 	private JPanel createPanelDate()
 	{
-
 		//----  Date format list
 
 		AppConfig config = AppConfig.INSTANCE;
@@ -1786,10 +1281,6 @@ class PreferencesDialog
 		gridBag.setConstraints(firstDayOfWeekComboBox, gbc);
 		controlInnerPanel.add(firstDayOfWeekComboBox);
 
-		// Update widths of labels and panels
-		DatePanelLabel.update();
-		DatePanel.update();
-
 
 		//----  Outer panel
 
@@ -1834,15 +1325,20 @@ class PreferencesDialog
 		gridBag.setConstraints(controlPanel, gbc);
 		outerPanel.add(controlPanel);
 
-		return outerPanel;
+		// Update widths of components when outer panel is added to a window
+		WindowUtils.addRunOnAddedToWindow(outerPanel, () ->
+		{
+			DatePanelLabel.update();
+			DatePanel.update();
+		});
 
+		return outerPanel;
 	}
 
 	//------------------------------------------------------------------
 
 	private JPanel createPanelFonts()
 	{
-
 		//----  Control panel
 
 		GridBagLayout gridBag = new GridBagLayout();
@@ -1964,7 +1460,6 @@ class PreferencesDialog
 		outerPanel.add(controlPanel);
 
 		return outerPanel;
-
 	}
 
 	//------------------------------------------------------------------
@@ -2055,68 +1550,550 @@ class PreferencesDialog
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Class variables
+//  Enumerated types
 ////////////////////////////////////////////////////////////////////////
 
-	private static	Point	location;
-	private static	int		tabIndex;
 
-////////////////////////////////////////////////////////////////////////
-//  Static initialiser
-////////////////////////////////////////////////////////////////////////
+	// TABS
 
-	static
+
+	private enum Tab
 	{
-		COMMAND_MAP = new HashMap<>();
-		COMMAND_MAP.put(SingleSelectionList.Command.EDIT_ELEMENT,
-						Command.EDIT_DATE_FORMAT);
-		COMMAND_MAP.put(SingleSelectionList.Command.DELETE_ELEMENT,
-						Command.CONFIRM_DELETE_DATE_FORMAT);
-		COMMAND_MAP.put(SingleSelectionList.Command.DELETE_EX_ELEMENT,
-						Command.DELETE_DATE_FORMAT);
-		COMMAND_MAP.put(SingleSelectionList.Command.MOVE_ELEMENT_UP,
-						Command.MOVE_DATE_FORMAT_UP);
-		COMMAND_MAP.put(SingleSelectionList.Command.MOVE_ELEMENT_DOWN,
-						Command.MOVE_DATE_FORMAT_DOWN);
-		COMMAND_MAP.put(SingleSelectionList.Command.DRAG_ELEMENT,
-						Command.MOVE_DATE_FORMAT);
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		GENERAL
+		(
+			"General"
+		)
+		{
+			@Override
+			protected JPanel createPanel(PreferencesDialog dialog)
+			{
+				return dialog.createPanelGeneral();
+			}
+
+			//----------------------------------------------------------
+
+			@Override
+			protected void validatePreferences(PreferencesDialog dialog)
+				throws AppException
+			{
+				dialog.validatePreferencesGeneral();
+			}
+
+			//----------------------------------------------------------
+
+			@Override
+			protected void setPreferences(PreferencesDialog dialog)
+			{
+				dialog.setPreferencesGeneral();
+			}
+
+			//----------------------------------------------------------
+		},
+
+		APPEARANCE
+		(
+			"Appearance"
+		)
+		{
+			@Override
+			protected JPanel createPanel(PreferencesDialog dialog)
+			{
+				return dialog.createPanelAppearance();
+			}
+
+			//----------------------------------------------------------
+
+			@Override
+			protected void validatePreferences(PreferencesDialog dialog)
+				throws AppException
+			{
+				dialog.validatePreferencesAppearance();
+			}
+
+			//----------------------------------------------------------
+
+			@Override
+			protected void setPreferences(PreferencesDialog dialog)
+			{
+				dialog.setPreferencesAppearance();
+			}
+
+			//----------------------------------------------------------
+		},
+
+		DATE
+		(
+			"Date"
+		)
+		{
+			@Override
+			protected JPanel createPanel(PreferencesDialog dialog)
+			{
+				return dialog.createPanelDate();
+			}
+
+			//----------------------------------------------------------
+
+			@Override
+			protected void validatePreferences(PreferencesDialog dialog)
+				throws AppException
+			{
+				dialog.validatePreferencesDate();
+			}
+
+			//----------------------------------------------------------
+
+			@Override
+			protected void setPreferences(PreferencesDialog dialog)
+			{
+				dialog.setPreferencesDate();
+			}
+
+			//----------------------------------------------------------
+		},
+
+		FONTS
+		(
+			"Fonts"
+		)
+		{
+			@Override
+			protected JPanel createPanel(PreferencesDialog dialog)
+			{
+				return dialog.createPanelFonts();
+			}
+
+			//----------------------------------------------------------
+
+			@Override
+			protected void validatePreferences(PreferencesDialog dialog)
+				throws AppException
+			{
+				dialog.validatePreferencesFonts();
+			}
+
+			//----------------------------------------------------------
+
+			@Override
+			protected void setPreferences(PreferencesDialog dialog)
+			{
+				dialog.setPreferencesFonts();
+			}
+
+			//----------------------------------------------------------
+		};
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance variables
+	////////////////////////////////////////////////////////////////////
+
+		private	String	text;
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private Tab(String text)
+		{
+			this.text = text;
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Abstract methods
+	////////////////////////////////////////////////////////////////////
+
+		protected abstract JPanel createPanel(PreferencesDialog dialog);
+
+		//--------------------------------------------------------------
+
+		protected abstract void validatePreferences(PreferencesDialog dialog)
+			throws AppException;
+
+		//--------------------------------------------------------------
+
+		protected abstract void setPreferences(PreferencesDialog dialog);
+
+		//--------------------------------------------------------------
+
 	}
 
+	//==================================================================
+
 ////////////////////////////////////////////////////////////////////////
-//  Instance variables
+//  Member classes : non-inner classes
 ////////////////////////////////////////////////////////////////////////
 
-	// Main panel
-	private	boolean									accepted;
-	private	JTabbedPane								tabbedPanel;
 
-	// General panel
-	private	BooleanComboBox							showUnixPathnamesComboBox;
-	private	BooleanComboBox							selectTextOnFocusGainedComboBox;
-	private	BooleanComboBox							saveMainWindowLocationComboBox;
+	// DATE-FORMAT SELECTION LIST CLASS
 
-	// Appearance panel
-	private	FComboBox<String>						lookAndFeelComboBox;
-	private	FComboBox<TextRendering.Antialiasing>	textAntialiasingComboBox;
-	private	BooleanComboBox							showAdjacentMonthsComboBox;
 
-	// Date panel
-	private	DateFormatSelectionList					dateFormatList;
-	private	JScrollPane								dateFormatListScrollPane;
-	private	JButton									dateFormatAddButton;
-	private	JButton									dateFormatEditButton;
-	private	JButton									dateFormatDeleteButton;
-	private	FComboBox<DateNamesSource>				dateNamesSourceComboBox;
-	private	FComboBox<LocaleEx>						dateNamesLocaleComboBox;
-	private	JButton									editMonthNamesButton;
-	private	JButton									editDayNamesButton;
-	private	Map<DateNamesSource, List<Component>>	dateNamesComponents;
-	private	List<String>							monthNames;
-	private	List<String>							dayNames;
-	private	FComboBox<String>						firstDayOfWeekComboBox;
+	private static class DateFormatSelectionList
+		extends SingleSelectionList<DateFormat>
+	{
 
-	// Fonts panel
-	private	FontPanel[]								fontPanels;
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		private static final	int		NAME_FIELD_NUM_COLUMNS		= 16;
+		private static final	int		PATTERN_FIELD_NUM_COLUMNS	= 32;
+		private static final	int		NUM_ROWS					= 8;
+
+		private static final	int		SEPARATOR_WIDTH	= 1;
+
+		private static final	Color	SEPARATOR_COLOUR	= new Color(192, 200, 192);
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private DateFormatSelectionList(List<DateFormat> formats)
+		{
+			super(NAME_FIELD_NUM_COLUMNS + PATTERN_FIELD_NUM_COLUMNS, NUM_ROWS, AppFont.MAIN.getFont(),
+				  formats);
+			setExtraWidth(2 * getHorizontalMargin() + SEPARATOR_WIDTH);
+			setRowHeight(getRowHeight() + 1);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods : overriding methods
+	////////////////////////////////////////////////////////////////////
+
+		@Override
+		protected void drawElement(Graphics gr,
+								   int      index)
+		{
+			// Create copy of graphics context
+			Graphics2D gr2d = GuiUtils.copyGraphicsContext(gr);
+
+			// Set rendering hints for text antialiasing and fractional metrics
+			TextRendering.setHints(gr2d);
+
+			// Get date format
+			DateFormat dateFormat = getElement(index);
+
+			// Get name text and truncate it if it is too wide
+			FontMetrics fontMetrics = gr2d.getFontMetrics();
+			int nameFieldWidth = NAME_FIELD_NUM_COLUMNS * getColumnWidth();
+			int patternFieldWidth = getMaxTextWidth() - nameFieldWidth;
+			String text = truncateText(dateFormat.getName(), fontMetrics, nameFieldWidth);
+
+			// Draw name text
+			int rowHeight = getRowHeight();
+			int x = getHorizontalMargin();
+			int y = index * rowHeight;
+			int textY = y + DEFAULT_VERTICAL_MARGIN + fontMetrics.getAscent();
+			gr2d.setColor(getForegroundColour(index));
+			gr2d.drawString(text, x, textY);
+
+			// Get pattern text and truncate it if it is too wide
+			text = truncateText(dateFormat.getPattern(), fontMetrics, patternFieldWidth);
+
+			// Draw pattern text
+			x += nameFieldWidth + getExtraWidth();
+			gr2d.drawString(text, x, textY);
+
+			// Draw separator
+			x = getHorizontalMargin() + nameFieldWidth + getExtraWidth() / 2;
+			gr2d.setColor(SEPARATOR_COLOUR);
+			gr2d.drawLine(x, y, x, y + rowHeight - 1);
+
+			// Draw bottom border
+			y += rowHeight - 1;
+			gr2d.drawLine(0, y, getWidth() - 1, y);
+		}
+
+		//--------------------------------------------------------------
+
+		@Override
+		protected String getPopUpText(int index)
+		{
+			DateFormat dateFormat = getElement(index);
+			return dateFormat.getName() + " : " + dateFormat.getPattern();
+		}
+
+		//--------------------------------------------------------------
+
+		@Override
+		protected boolean isShowPopUp(int index)
+		{
+			DateFormat dateFormat = getElement(index);
+			FontMetrics fontMetrics = getFontMetrics(getFont());
+			int nameFieldWidth = NAME_FIELD_NUM_COLUMNS * getColumnWidth();
+			int patternFieldWidth = getMaxTextWidth() - nameFieldWidth;
+			return (fontMetrics.stringWidth(dateFormat.getName()) > nameFieldWidth)
+					|| (fontMetrics.stringWidth(dateFormat.getPattern()) > patternFieldWidth);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods
+	////////////////////////////////////////////////////////////////////
+
+		private List<String> getNames(int index)
+		{
+			List<String> names = new ArrayList<>();
+			for (int i = 0; i < getNumElements(); i++)
+			{
+				if (i != index)
+					names.add(getElement(i).getName());
+			}
+			return names;
+		}
+
+		//--------------------------------------------------------------
+
+	}
+
+	//==================================================================
+
+
+	// DATE PANEL CLASS
+
+
+	private static class DatePanel
+		extends FixedWidthPanel
+	{
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		private static final	String	KEY	= DatePanel.class.getCanonicalName();
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private DatePanel(LayoutManager layout)
+		{
+			super(layout);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Class methods
+	////////////////////////////////////////////////////////////////////
+
+		private static void reset()
+		{
+			MaxValueMap.removeAll(KEY);
+		}
+
+		//--------------------------------------------------------------
+
+		private static void update()
+		{
+			MaxValueMap.update(KEY);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods : overriding methods
+	////////////////////////////////////////////////////////////////////
+
+		@Override
+		protected String getKey()
+		{
+			return KEY;
+		}
+
+		//--------------------------------------------------------------
+
+	}
+
+	//==================================================================
+
+
+	// DATE PANEL LABEL CLASS
+
+
+	private static class DatePanelLabel
+		extends FixedWidthLabel
+	{
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		private static final	String	KEY	= DatePanelLabel.class.getCanonicalName();
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private DatePanelLabel(String text)
+		{
+			super(text);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Class methods
+	////////////////////////////////////////////////////////////////////
+
+		private static void reset()
+		{
+			MaxValueMap.removeAll(KEY);
+		}
+
+		//--------------------------------------------------------------
+
+		private static void update()
+		{
+			MaxValueMap.update(KEY);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods : overriding methods
+	////////////////////////////////////////////////////////////////////
+
+		@Override
+		protected String getKey()
+		{
+			return KEY;
+		}
+
+		//--------------------------------------------------------------
+
+	}
+
+	//==================================================================
+
+
+	// FONT PANEL CLASS
+
+
+	private static class FontPanel
+	{
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		private static final	int		MIN_SIZE	= 0;
+		private static final	int		MAX_SIZE	= 99;
+
+		private static final	int		SIZE_FIELD_LENGTH	= 2;
+
+		private static final	String	DEFAULT_FONT_STR	= "<default font>";
+
+	////////////////////////////////////////////////////////////////////
+	//  Member classes : non-inner classes
+	////////////////////////////////////////////////////////////////////
+
+
+		// SIZE SPINNER CLASS
+
+
+		private static class SizeSpinner
+			extends IntegerSpinner
+		{
+
+		////////////////////////////////////////////////////////////////
+		//  Constructors
+		////////////////////////////////////////////////////////////////
+
+			private SizeSpinner(int value)
+			{
+				super(value, MIN_SIZE, MAX_SIZE, SIZE_FIELD_LENGTH);
+				AppFont.TEXT_FIELD.apply(this);
+			}
+
+			//----------------------------------------------------------
+
+		////////////////////////////////////////////////////////////////
+		//  Instance methods : overriding methods
+		////////////////////////////////////////////////////////////////
+
+			/**
+			 * @throws NumberFormatException
+			 */
+
+			@Override
+			protected int getEditorValue()
+			{
+				IntegerValueField field = (IntegerValueField)getEditor();
+				return field.isEmpty() ? 0 : field.getValue();
+			}
+
+			//----------------------------------------------------------
+
+			@Override
+			protected void setEditorValue(int value)
+			{
+				IntegerValueField field = (IntegerValueField)getEditor();
+				if (value == 0)
+					field.setText(null);
+				else
+					field.setValue(value);
+			}
+
+			//----------------------------------------------------------
+
+		}
+
+		//==============================================================
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance variables
+	////////////////////////////////////////////////////////////////////
+
+		private	FComboBox<String>		nameComboBox;
+		private	FComboBox<FontStyle>	styleComboBox;
+		private	SizeSpinner				sizeSpinner;
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private FontPanel(FontEx   font,
+						  String[] fontNames)
+		{
+			nameComboBox = new FComboBox<>();
+			nameComboBox.addItem(DEFAULT_FONT_STR);
+			for (String fontName : fontNames)
+				nameComboBox.addItem(fontName);
+			nameComboBox.setSelectedIndex(Utils.indexOf(font.getName(), fontNames) + 1);
+
+			styleComboBox = new FComboBox<>(FontStyle.values());
+			styleComboBox.setSelectedValue(font.getStyle());
+
+			sizeSpinner = new SizeSpinner(font.getSize());
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods
+	////////////////////////////////////////////////////////////////////
+
+		public FontEx getFont()
+		{
+			String name = (nameComboBox.getSelectedIndex() <= 0) ? null : nameComboBox.getSelectedValue();
+			return new FontEx(name, styleComboBox.getSelectedValue(), sizeSpinner.getIntValue());
+		}
+
+		//--------------------------------------------------------------
+
+	}
+
+	//==================================================================
 
 }
 

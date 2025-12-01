@@ -2,7 +2,7 @@
 
 IntervalPanel.java
 
-Interval panel class.
+Class: interval panel.
 
 \*====================================================================*/
 
@@ -60,10 +60,12 @@ import uk.blankaspect.ui.swing.misc.GuiUtils;
 
 import uk.blankaspect.ui.swing.spinner.FIntegerSpinner;
 
+import uk.blankaspect.ui.swing.window.WindowUtils;
+
 //----------------------------------------------------------------------
 
 
-// INTERVAL PANEL CLASS
+// CLASS: INTERVAL PANEL
 
 
 class IntervalPanel
@@ -75,18 +77,18 @@ class IntervalPanel
 //  Constants
 ////////////////////////////////////////////////////////////////////////
 
-	private static final	int	MIN_INTERVAL	= 1;
-	private static final	int	MAX_INTERVAL	= 9999;
+	private static final	int		MIN_INTERVAL	= 1;
+	private static final	int		MAX_INTERVAL	= 9999;
 
-	private static final	int	MIN_NUM_INTERVALS	= 1;
-	private static final	int	MAX_NUM_INTERVALS	= 9999;
+	private static final	int		MIN_NUM_INTERVALS	= 1;
+	private static final	int		MAX_NUM_INTERVALS	= 9999;
 
-	private static final	int	MIN_NUM_DAYS	= 1;
-	private static final	int	MAX_NUM_DAYS	= 9999;
+	private static final	int		MIN_NUM_DAYS	= 1;
+	private static final	int		MAX_NUM_DAYS	= 9999;
 
-	private static final	int	INTERVAL_FIELD_LENGTH		= 4;
-	private static final	int	NUM_INTERVALS_FIELD_LENGTH	= 4;
-	private static final	int	NUM_DAYS_FIELD_LENGTH		= 4;
+	private static final	int		INTERVAL_FIELD_LENGTH		= 4;
+	private static final	int		NUM_INTERVALS_FIELD_LENGTH	= 4;
+	private static final	int		NUM_DAYS_FIELD_LENGTH		= 4;
 
 	private static final	String	START_DATE_STR		= "Start date";
 	private static final	String	INTERVAL_STR		= "Interval";
@@ -121,199 +123,18 @@ class IntervalPanel
 	}
 
 ////////////////////////////////////////////////////////////////////////
-//  Enumerated types
+//  Instance variables
 ////////////////////////////////////////////////////////////////////////
 
-
-	// ERROR IDENTIFIERS
-
-
-	private enum ErrorId
-		implements AppException.IId
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		INVALID_START_DATE
-		("The %1 of the start date is invalid."),
-
-		START_DATE_OUT_OF_BOUNDS
-		("The %1 of the start date must be between %2 and %3."),
-
-		INVALID_END_DATE
-		("The %1 of the end date is invalid."),
-
-		END_DATE_OUT_OF_BOUNDS
-		("The %1 of the end date must be between %2 and %3."),
-
-		DATES_OUT_OF_ORDER
-		("The end date is before the start date.");
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private ErrorId(String message)
-		{
-			this.message = message;
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods : AppException.IId interface
-	////////////////////////////////////////////////////////////////////
-
-		public String getMessage()
-		{
-			return message;
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance variables
-	////////////////////////////////////////////////////////////////////
-
-		private	String	message;
-
-	}
-
-	//==================================================================
-
-////////////////////////////////////////////////////////////////////////
-//  Member classes : non-inner classes
-////////////////////////////////////////////////////////////////////////
-
-
-	// RADIO BUTTON CLASS
-
-
-	private static class RadioButton
-		extends FixedWidthRadioButton
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		private static final	String	KEY	= RadioButton.class.getCanonicalName();
-
-		private static final	Color	BACKGROUND_COLOUR	= new Color(252, 224, 128);
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private RadioButton(String text)
-		{
-			super(text);
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Class methods
-	////////////////////////////////////////////////////////////////////
-
-		private static void reset()
-		{
-			MaxValueMap.removeAll(KEY);
-		}
-
-		//--------------------------------------------------------------
-
-		private static void update()
-		{
-			MaxValueMap.update(KEY);
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods : overriding methods
-	////////////////////////////////////////////////////////////////////
-
-		@Override
-		public Color getBackground()
-		{
-			return (isSelected() ? BACKGROUND_COLOUR : super.getBackground());
-		}
-
-		//--------------------------------------------------------------
-
-		@Override
-		protected String getKey()
-		{
-			return KEY;
-		}
-
-		//--------------------------------------------------------------
-
-	}
-
-	//==================================================================
-
-
-	// TEXT AREA DIALOG CLASS
-
-
-	private static class TextAreaDialog
-		extends NonEditableTextAreaDialog
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constants
-	////////////////////////////////////////////////////////////////////
-
-		private static final	int	NUM_COLUMNS	= 64;
-		private static final	int	NUM_ROWS	= 20;
-
-		private static final	String	KEY	= TextAreaDialog.class.getCanonicalName();
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private TextAreaDialog(Window owner,
-							   String title,
-							   String text)
-		{
-			super(owner, title, KEY, NUM_COLUMNS, NUM_ROWS, text);
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Class methods
-	////////////////////////////////////////////////////////////////////
-
-		private static TextAreaDialog showDialog(Component parent,
-												 String    title,
-												 String    text)
-		{
-			return new TextAreaDialog(GuiUtils.getWindow(parent), title, text);
-		}
-
-		//--------------------------------------------------------------
-
-	////////////////////////////////////////////////////////////////////
-	//  Instance methods : overriding methods
-	////////////////////////////////////////////////////////////////////
-
-		@Override
-		protected void setTextAreaAttributes()
-		{
-			setCaretToStart();
-		}
-
-		//--------------------------------------------------------------
-
-	}
-
-	//==================================================================
+	private	Mode				mode;
+	private	String				dateFormatKey;
+	private	DatePanel			startDatePanel;
+	private	FIntegerSpinner		intervalSpinner;
+	private	FIntegerSpinner		numDaysSpinner;
+	private	FIntegerSpinner		numIntervalsSpinner;
+	private	DatePanel			endDatePanel;
+	private	DateFormatComboBox	dateFormatComboBox;
+	private	JButton				generateButton;
 
 ////////////////////////////////////////////////////////////////////////
 //  Constructors
@@ -321,7 +142,6 @@ class IntervalPanel
 
 	public IntervalPanel()
 	{
-
 		// Initialise instance variables
 		mode = Mode.NUM_INTERVALS;
 
@@ -356,8 +176,7 @@ class IntervalPanel
 		controlPanel.add(startDateLabel);
 
 		// Panel: start date
-		startDatePanel = new DatePanel(KEY + keyIndex++, SELECT_START_DATE_TOOLTIP_STR,
-									   TODAY_START_TOOLTIP_STR);
+		startDatePanel = new DatePanel(KEY + keyIndex++, SELECT_START_DATE_TOOLTIP_STR, TODAY_START_TOOLTIP_STR);
 		startDatePanel.setObserver(this);
 
 		gbc.gridx = 1;
@@ -403,8 +222,7 @@ class IntervalPanel
 		controlPanel.add(intervalPanel);
 
 		// Spinner: interval
-		intervalSpinner = new FIntegerSpinner(MIN_INTERVAL, MIN_INTERVAL, MAX_INTERVAL,
-											  INTERVAL_FIELD_LENGTH);
+		intervalSpinner = new FIntegerSpinner(MIN_INTERVAL, MIN_INTERVAL, MAX_INTERVAL, INTERVAL_FIELD_LENGTH);
 
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -489,8 +307,7 @@ class IntervalPanel
 		controlPanel.add(numDaysRadioButton);
 
 		// Spinner: number of days
-		numDaysSpinner = new FIntegerSpinner(MIN_NUM_DAYS, MIN_NUM_DAYS, MAX_NUM_DAYS,
-											 NUM_DAYS_FIELD_LENGTH);
+		numDaysSpinner = new FIntegerSpinner(MIN_NUM_DAYS, MIN_NUM_DAYS, MAX_NUM_DAYS, NUM_DAYS_FIELD_LENGTH);
 
 		gbc.gridx = 1;
 		gbc.gridy = gridY++;
@@ -523,8 +340,7 @@ class IntervalPanel
 		controlPanel.add(endDateRadioButton);
 
 		// Panel: end date
-		endDatePanel = new DatePanel(KEY + keyIndex++, SELECT_END_DATE_TOOLTIP_STR,
-									 TODAY_END_TOOLTIP_STR);
+		endDatePanel = new DatePanel(KEY + keyIndex++, SELECT_END_DATE_TOOLTIP_STR, TODAY_END_TOOLTIP_STR);
 		endDatePanel.setObserver(this);
 
 		gbc.gridx = 1;
@@ -568,9 +384,6 @@ class IntervalPanel
 		gbc.insets = AppConstants.COMPONENT_INSETS;
 		gridBag.setConstraints(dateFormatComboBox, gbc);
 		controlPanel.add(dateFormatComboBox);
-
-		// Update widths of radio buttons
-		RadioButton.update();
 
 
 		//----  Button panel
@@ -620,9 +433,11 @@ class IntervalPanel
 		gridBag.setConstraints(buttonPanel, gbc);
 		add(buttonPanel);
 
-		// Add listeners
+		// Update date-format key when date format is updated
 		dateFormatKey = AppConfig.INSTANCE.addDateFormatObserver(this);
 
+		// Update widths of radio buttons when this panel is added to a window
+		WindowUtils.addRunOnAddedToWindow(this, RadioButton::update);
 	}
 
 	//------------------------------------------------------------------
@@ -631,7 +446,9 @@ class IntervalPanel
 //  Instance methods : ActionListener interface
 ////////////////////////////////////////////////////////////////////////
 
-	public void actionPerformed(ActionEvent event)
+	@Override
+	public void actionPerformed(
+		ActionEvent	event)
 	{
 		try
 		{
@@ -655,7 +472,9 @@ class IntervalPanel
 //  Instance methods : CompoundDateField.Observer interface
 ////////////////////////////////////////////////////////////////////////
 
-	public void notifyChanged(CompoundDateField source)
+	@Override
+	public void notifyChanged(
+		CompoundDateField	source)
 	{
 		updateButtons();
 	}
@@ -666,7 +485,9 @@ class IntervalPanel
 //  Instance methods : Property.IObserver interface
 ////////////////////////////////////////////////////////////////////////
 
-	public void propertyChanged(Property property)
+	@Override
+	public void propertyChanged(
+		Property	property)
 	{
 		if (property.getKey().equals(dateFormatKey))
 		{
@@ -727,7 +548,8 @@ class IntervalPanel
 
 	//------------------------------------------------------------------
 
-	private void onSetMode(String key)
+	private void onSetMode(
+		String	key)
 	{
 		for (Mode m : Mode.values())
 		{
@@ -835,18 +657,204 @@ class IntervalPanel
 	//------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////
-//  Instance variables
+//  Enumerated types
 ////////////////////////////////////////////////////////////////////////
 
-	private	Mode				mode;
-	private	String				dateFormatKey;
-	private	DatePanel			startDatePanel;
-	private	FIntegerSpinner		intervalSpinner;
-	private	FIntegerSpinner		numDaysSpinner;
-	private	FIntegerSpinner		numIntervalsSpinner;
-	private	DatePanel			endDatePanel;
-	private	DateFormatComboBox	dateFormatComboBox;
-	private	JButton				generateButton;
+
+	// ENUMERATION: ERROR IDENTIFIERS
+
+
+	private enum ErrorId
+		implements AppException.IId
+	{
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		INVALID_START_DATE
+		("The %1 of the start date is invalid."),
+
+		START_DATE_OUT_OF_BOUNDS
+		("The %1 of the start date must be between %2 and %3."),
+
+		INVALID_END_DATE
+		("The %1 of the end date is invalid."),
+
+		END_DATE_OUT_OF_BOUNDS
+		("The %1 of the end date must be between %2 and %3."),
+
+		DATES_OUT_OF_ORDER
+		("The end date is before the start date.");
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance variables
+	////////////////////////////////////////////////////////////////////
+
+		private	String	message;
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private ErrorId(
+			String	message)
+		{
+			this.message = message;
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods : AppException.IId interface
+	////////////////////////////////////////////////////////////////////
+
+		@Override
+		public String getMessage()
+		{
+			return message;
+		}
+
+		//--------------------------------------------------------------
+
+	}
+
+	//==================================================================
+
+////////////////////////////////////////////////////////////////////////
+//  Member classes : non-inner classes
+////////////////////////////////////////////////////////////////////////
+
+
+	// CLASS: RADIO BUTTON
+
+
+	private static class RadioButton
+		extends FixedWidthRadioButton
+	{
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		private static final	String	KEY	= RadioButton.class.getCanonicalName();
+
+		private static final	Color	BACKGROUND_COLOUR	= new Color(252, 224, 128);
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private RadioButton(
+			String	text)
+		{
+			super(text);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Class methods
+	////////////////////////////////////////////////////////////////////
+
+		private static void reset()
+		{
+			MaxValueMap.removeAll(KEY);
+		}
+
+		//--------------------------------------------------------------
+
+		private static void update()
+		{
+			MaxValueMap.update(KEY);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods : overriding methods
+	////////////////////////////////////////////////////////////////////
+
+		@Override
+		public Color getBackground()
+		{
+			return isSelected() ? BACKGROUND_COLOUR : super.getBackground();
+		}
+
+		//--------------------------------------------------------------
+
+		@Override
+		protected String getKey()
+		{
+			return KEY;
+		}
+
+		//--------------------------------------------------------------
+
+	}
+
+	//==================================================================
+
+
+	// CLASS: TEXT AREA DIALOG
+
+
+	private static class TextAreaDialog
+		extends NonEditableTextAreaDialog
+	{
+
+	////////////////////////////////////////////////////////////////////
+	//  Constants
+	////////////////////////////////////////////////////////////////////
+
+		private static final	int		NUM_COLUMNS	= 64;
+		private static final	int		NUM_ROWS	= 20;
+
+		private static final	String	KEY	= TextAreaDialog.class.getCanonicalName();
+
+	////////////////////////////////////////////////////////////////////
+	//  Constructors
+	////////////////////////////////////////////////////////////////////
+
+		private TextAreaDialog(
+			Window	owner,
+			String	title,
+			String	text)
+		{
+			super(owner, title, KEY, NUM_COLUMNS, NUM_ROWS, text);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Class methods
+	////////////////////////////////////////////////////////////////////
+
+		private static TextAreaDialog showDialog(
+			Component	parent,
+			String		title,
+			String		text)
+		{
+			return new TextAreaDialog(GuiUtils.getWindow(parent), title, text);
+		}
+
+		//--------------------------------------------------------------
+
+	////////////////////////////////////////////////////////////////////
+	//  Instance methods : overriding methods
+	////////////////////////////////////////////////////////////////////
+
+		@Override
+		protected void setTextAreaAttributes()
+		{
+			setCaretToStart();
+		}
+
+		//--------------------------------------------------------------
+
+	}
+
+	//==================================================================
 
 }
 

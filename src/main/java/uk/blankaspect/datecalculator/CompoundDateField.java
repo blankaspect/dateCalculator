@@ -358,7 +358,7 @@ class CompoundDateField
 		@Override
 		protected int getColumnWidth()
 		{
-			return (FontUtils.getCharWidth('0', getFontMetrics(getFont())) + 1);
+			return FontUtils.getCharWidth('0', getFontMetrics(getFont())) + 1;
 		}
 
 		//--------------------------------------------------------------

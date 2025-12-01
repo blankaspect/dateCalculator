@@ -2,7 +2,7 @@
 
 DateCalculatorApp.java
 
-Application class.
+Class: application.
 
 \*====================================================================*/
 
@@ -46,7 +46,7 @@ import uk.blankaspect.ui.swing.textfield.TextFieldUtils;
 //----------------------------------------------------------------------
 
 
-// APPLICATION CLASS
+// CLASS: APPLICATION
 
 
 public class DateCalculatorApp
@@ -192,8 +192,10 @@ public class DateCalculatorApp
 			}
 		}
 		if (lookAndFeelName != null)
+		{
 			showWarningMessage(SHORT_NAME + " : " + CONFIG_ERROR_STR,
 							   LAF_ERROR1_STR + lookAndFeelName + LAF_ERROR2_STR);
+		}
 
 		// Select all text when a text field gains focus
 		if (config.isSelectTextOnFocusGained())

@@ -208,8 +208,7 @@ public class DateFormat
 
 		public AppException getException()
 		{
-			return ((index < 0) ? new AppException(id)
-								: new AppException(INDEX_STR + index + "\n" + id.getMessage()));
+			return (index < 0) ? new AppException(id) : new AppException(INDEX_STR + index + "\n" + id.getMessage());
 		}
 
 		//--------------------------------------------------------------
@@ -501,7 +500,7 @@ public class DateFormat
 	@Override
 	public String toString()
 	{
-		return (name + SEPARATOR + getPattern());
+		return name + SEPARATOR + getPattern();
 	}
 
 	//------------------------------------------------------------------
