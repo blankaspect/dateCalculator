@@ -128,7 +128,6 @@ class PreferencesDialog
 	private static final	String	WRITE_CONFIG_FILE_STR	= "Write configuration file";
 
 	// General panel
-	private static final	String	SHOW_UNIX_PATHNAMES_STR			= "Display UNIX-style pathnames";
 	private static final	String	SELECT_TEXT_ON_FOCUS_GAINED_STR	= "Select text when focus is gained";
 	private static final	String	SAVE_MAIN_WINDOW_LOCATION_STR	= "Save location of main window";
 
@@ -208,7 +207,6 @@ class PreferencesDialog
 	private	JTabbedPane								tabbedPanel;
 
 	// General panel
-	private	BooleanComboBox							showUnixPathnamesComboBox;
 	private	BooleanComboBox							selectTextOnFocusGainedComboBox;
 	private	BooleanComboBox							saveMainWindowLocationComboBox;
 
@@ -712,36 +710,6 @@ class PreferencesDialog
 		int gridY = 0;
 
 		AppConfig config = AppConfig.INSTANCE;
-
-		// Label: show UNIX pathnames
-		JLabel showUnixPathnamesLabel = new FLabel(SHOW_UNIX_PATHNAMES_STR);
-
-		gbc.gridx = 0;
-		gbc.gridy = gridY;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		gbc.anchor = GridBagConstraints.LINE_END;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = AppConstants.COMPONENT_INSETS;
-		gridBag.setConstraints(showUnixPathnamesLabel, gbc);
-		controlPanel.add(showUnixPathnamesLabel);
-
-		// Combo box: show UNIX pathnames
-		showUnixPathnamesComboBox = new BooleanComboBox(config.isShowUnixPathnames());
-
-		gbc.gridx = 1;
-		gbc.gridy = gridY++;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
-		gbc.anchor = GridBagConstraints.LINE_START;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = AppConstants.COMPONENT_INSETS;
-		gridBag.setConstraints(showUnixPathnamesComboBox, gbc);
-		controlPanel.add(showUnixPathnamesComboBox);
 
 		// Label: select text on focus gained
 		JLabel selectTextOnFocusGainedLabel = new FLabel(SELECT_TEXT_ON_FOCUS_GAINED_STR);
@@ -1495,7 +1463,6 @@ class PreferencesDialog
 	private void setPreferencesGeneral()
 	{
 		AppConfig config = AppConfig.INSTANCE;
-		config.setShowUnixPathnames(showUnixPathnamesComboBox.getSelectedValue());
 		config.setSelectTextOnFocusGained(selectTextOnFocusGainedComboBox.getSelectedValue());
 		if (saveMainWindowLocationComboBox.getSelectedValue() != config.isMainWindowLocation())
 			config.setMainWindowLocation(saveMainWindowLocationComboBox.getSelectedValue() ? new Point()

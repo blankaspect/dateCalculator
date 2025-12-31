@@ -110,7 +110,6 @@ class AppConfig
 		String	NAMES_SOURCE				= "namesSource";
 		String	SELECT_TEXT_ON_FOCUS_GAINED	= "selectTextOnFocusGained";
 		String	SHOW_ADJACENT_MONTHS		= "showAdjacentMonths";
-		String	SHOW_UNIX_PATHNAMES			= "showUnixPathnames";
 		String	TEXT_ANTIALIASING			= "textAntialiasing";
 	}
 
@@ -629,70 +628,6 @@ class AppConfig
 ////////////////////////////////////////////////////////////////////////
 //  Member classes : inner classes
 ////////////////////////////////////////////////////////////////////////
-
-
-	// PROPERTY CLASS: SHOW UNIX PATHNAMES
-
-
-	private class CPShowUnixPathnames
-		extends Property.BooleanProperty
-	{
-
-	////////////////////////////////////////////////////////////////////
-	//  Constructors
-	////////////////////////////////////////////////////////////////////
-
-		private CPShowUnixPathnames()
-		{
-			super(concatenateKeys(Key.GENERAL, Key.SHOW_UNIX_PATHNAMES));
-			value = false;
-		}
-
-		//--------------------------------------------------------------
-
-	}
-
-	//------------------------------------------------------------------
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//  Instance methods : associated methods in enclosing class
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-	public boolean isShowUnixPathnames()
-	{
-		return cpShowUnixPathnames.getValue();
-	}
-
-	//------------------------------------------------------------------
-
-	public void setShowUnixPathnames(boolean value)
-	{
-		cpShowUnixPathnames.setValue(value);
-	}
-
-	//------------------------------------------------------------------
-
-	public void addShowUnixPathnamesObserver(Property.IObserver observer)
-	{
-		cpShowUnixPathnames.addObserver(observer);
-	}
-
-	//------------------------------------------------------------------
-
-	public void removeShowUnixPathnamesObserver(Property.IObserver observer)
-	{
-		cpShowUnixPathnames.removeObserver(observer);
-	}
-
-	//------------------------------------------------------------------
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//  Instance variables : associated variables in enclosing class
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-	private	CPShowUnixPathnames	cpShowUnixPathnames	= new CPShowUnixPathnames();
-
-	//==================================================================
 
 
 	// PROPERTY CLASS: SELECT TEXT ON FOCUS GAINED

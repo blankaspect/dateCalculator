@@ -36,8 +36,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import uk.blankaspect.common.exception.ExceptionUtils;
-
 import uk.blankaspect.ui.swing.button.FButton;
 
 import uk.blankaspect.ui.swing.misc.GuiUtils;
@@ -270,11 +268,7 @@ class MainWindow
 	private void onEditPreferences()
 	{
 		if (PreferencesDialog.showDialog(this))
-		{
-			AppConfig config = AppConfig.INSTANCE;
-			ExceptionUtils.setUnixStyle(config.isShowUnixPathnames());
-			config.updateDateNames();
-		}
+			AppConfig.INSTANCE.updateDateNames();
 	}
 
 	//------------------------------------------------------------------
