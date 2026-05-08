@@ -30,11 +30,6 @@ table#dateFormatExamples td.output {
   white-space: nowrap;
 }
 
-ul.paddedItems li {
-  padding-top: 0.2em;
-  padding-bottom: 0.2em;
-}
-
 @media (prefers-color-scheme: light) {
   span.variable {
     color: #006080;
